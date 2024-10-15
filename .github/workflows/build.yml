@@ -9,4 +9,4 @@ jobs:
           java-version: "22"
           distribution: "temurin"
           cache: 'maven'
-      - run: mvn package --batch-mode
+      - run: mvn -B package --file backend/pom.xml
