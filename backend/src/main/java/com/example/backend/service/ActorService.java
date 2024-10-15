@@ -19,4 +19,8 @@ public class ActorService {
     public List<Actor> getAllActors() {
         return actorRepository.findAll();
     }
+
+    public List<Actor> getActorsByPrefix(String prefix) {
+        return actorRepository.findByNameStartingWith(prefix);
+    }
 }
