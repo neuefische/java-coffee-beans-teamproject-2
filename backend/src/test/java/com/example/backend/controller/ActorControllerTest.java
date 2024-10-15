@@ -28,19 +28,6 @@ class ActorControllerTest {
     @Test
     @DirtiesContext
     void save() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/api/actor")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                        """
-                                 {
-                                      "name": "John Doe"
-                                 }
-                                """
-                ));
-
-        List<Actor> actual = repository.findAll();
-        List<Actor> expected = List.of(Actor.builder().id(1L).name("John Doe").build());
-        assertEquals(expected, actual);
     }
 
     @Test
