@@ -23,10 +23,8 @@ public class MovieService {
     }
 
     public Movie getMovieById(Long movieId) {
-        if (movieRepository.existsById(movieId)) {
-            return movieRepository.findById(movieId).get();
-        }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Movie with id " + movieId + " does not exist");
+        return movieRepository.findById(movieId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Movie with id " + movieId + " not found"));
     }
 
     public void deleteMovie(Long movieId) {
