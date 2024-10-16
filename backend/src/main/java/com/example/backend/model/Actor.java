@@ -17,7 +17,7 @@ public class Actor {
     @GeneratedValue
     private Long id;
 
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.EAGER)
     private Set<Movie> movies;
 
     @Column(nullable = false)
