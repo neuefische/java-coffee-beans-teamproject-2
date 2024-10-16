@@ -1,9 +1,9 @@
 package com.example.backend.service;
 
-import com.example.backend.model.Movie;
-import com.example.backend.model.MovieRepository;
+import com.example.backend.model.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
@@ -14,6 +14,7 @@ public class MovieService {
     public Movie createMovie(Movie movie) {
         return movieRepository.save(movie);
     }
+
     public List<Movie> getAllMovies() {
         return movieRepository.findAll();
     }

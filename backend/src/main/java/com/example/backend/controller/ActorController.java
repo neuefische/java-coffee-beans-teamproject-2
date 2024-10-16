@@ -32,11 +32,6 @@ public class ActorController {
         return actorService.getActorsByPrefix(prefix).stream().map(ActorResponse::from).toList();
     }
 
-    @GetMapping("/movie/{movieId}")
-    public List<ActorResponse> getByMovieId(@PathVariable @NonNull Long movieId) {
-        return actorService.getActorsByMovieId(movieId).stream().map(ActorResponse::from).toList();
-    }
-
     @PutMapping
     public void update() {
         // TODO

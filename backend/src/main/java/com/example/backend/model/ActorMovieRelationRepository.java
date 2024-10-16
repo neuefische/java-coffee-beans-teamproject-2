@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ActorRepository extends JpaRepository<Actor, Long> {
-    List<Actor> findByNameStartingWith(String prefix);
+public interface ActorMovieRelationRepository extends JpaRepository<ActorMovieRelation, Long> {
+    List<ActorMovieRelation> findByMovieId(Long movieId);
 }

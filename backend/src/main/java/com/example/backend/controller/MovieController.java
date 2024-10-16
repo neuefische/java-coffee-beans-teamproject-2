@@ -18,12 +18,13 @@ public class MovieController {
     private final MovieService movieService;
 
     @PostMapping
-    public MovieResponse save(@RequestBody @NotNull CreateMovieRequest movieRequest){
+    public MovieResponse save(@RequestBody @NotNull CreateMovieRequest movieRequest) {
         Movie movie = movieRequest.toMovie();
         return MovieResponse.from(movieService.createMovie(movie));
     }
+
     @GetMapping
-    public List<MovieResponse> getAll(){
+    public List<MovieResponse> getAll() {
         return movieService.getAllMovies().stream().map(MovieResponse::from).collect(Collectors.toList());
     }
 }

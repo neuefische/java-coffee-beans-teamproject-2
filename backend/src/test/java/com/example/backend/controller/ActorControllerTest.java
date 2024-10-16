@@ -1,9 +1,6 @@
 package com.example.backend.controller;
 
-import com.example.backend.model.Actor;
-import com.example.backend.model.ActorRepository;
-import com.example.backend.model.Movie;
-import com.example.backend.model.MovieRepository;
+import com.example.backend.model.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -15,8 +12,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.List;
-import java.util.Set;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -26,7 +23,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ActorControllerTest {
     private static final String URL_BASE = "/api/actor";
     private static final String URL_AUTOCOMPLETION = "/api/actor/autocompletion/{prefix}";
-    private static final String URL_GET_BY_MOVIE = "/api/actor/movie/{movieId}";
 
     private static final long ID_FIRST = 1L;
     private static final long ID_SECOND = 2L;
@@ -45,6 +41,9 @@ class ActorControllerTest {
     @Autowired
     private MovieRepository movieRepository;
 
+    @Autowired
+    private ActorMovieRelationRepository actorMovieRelationRepository;
+
     @Test
     @DirtiesContext
     void saveTest_correct() throws Exception {
@@ -60,7 +59,7 @@ class ActorControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
         List<Actor> actual = actorRepository.findAll();
-        List<Actor> expected = List.of(Actor.builder().id(ID_FIRST).movies(Set.of()).name(NAME_JOHN).build());
+        List<Actor> expected = List.of(Actor.builder().id(ID_FIRST).name(NAME_JOHN).build());
         assertEquals(expected, actual);
     }
 
@@ -80,7 +79,7 @@ class ActorControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
         List<Actor> actual = actorRepository.findAll();
-        List<Actor> expected = List.of(Actor.builder().id(ID_FIRST).movies(Set.of()).name(NAME_JANE).build());
+        List<Actor> expected = List.of(Actor.builder().id(ID_FIRST).name(NAME_JANE).build());
         assertEquals(expected, actual);
     }
 
@@ -162,55 +161,4 @@ class ActorControllerTest {
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError());
     }
 
-    @Test
-    @DirtiesContext
-    void getByMovieIdTest_multipleMatch() throws Exception {
-        Movie movieFirst = Movie.builder().name("Some Movie Name First").build();
-        Movie movieSecond = Movie.builder().name("Some Movie Name Second").build();
-
-        movieRepository.saveAll(List.of(movieFirst, movieSecond));
-
-        actorRepository.saveAll(
-                List.of(
-                        Actor.builder().name(NAME_JANE).movies(Set.of(movieFirst)).build(),
-                        Actor.builder().name(NAME_JIM).movies(Set.of(movieFirst, movieSecond)).build(),
-                        Actor.builder().name(NAME_JOE).movies(Set.of(movieSecond)).build(),
-                        Actor.builder().name(NAME_JOHN).movies(Set.of()).build()
-                )
-        );
-
-        mvc.perform(MockMvcRequestBuilders.get(URL_GET_BY_MOVIE, movieSecond.getId()))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].name").value(NAME_JIM))
-                .andExpect(jsonPath("$[1].name").value(NAME_JOE));
-    }
-
-    @Test
-    @DirtiesContext
-    void getByMovieIdTest_noMatch() throws Exception {
-        Movie movieFirst = Movie.builder().name("Some Movie Name First").build();
-        Movie movieSecond = Movie.builder().name("Some Movie Name Second").build();
-
-        movieRepository.saveAll(List.of(movieFirst, movieSecond));
-
-        actorRepository.saveAll(
-                List.of(
-                        Actor.builder().name(NAME_JANE).movies(Set.of(movieFirst)).build(),
-                        Actor.builder().name(NAME_JIM).movies(Set.of(movieFirst)).build(),
-                        Actor.builder().name(NAME_JOE).movies(Set.of(movieFirst)).build(),
-                        Actor.builder().name(NAME_JOHN).movies(Set.of()).build()
-                )
-        );
-
-        mvc.perform(MockMvcRequestBuilders.get(URL_GET_BY_MOVIE, movieSecond.getId()))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(jsonPath("$", hasSize(0)));
-    }
-
-    @Test
-    void getByMovieIdTest_emptyRequest() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get(URL_GET_BY_MOVIE, ""))
-                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
-    }
 }

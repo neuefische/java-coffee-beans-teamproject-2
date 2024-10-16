@@ -1,6 +1,8 @@
 package com.example.backend.service;
 
 import com.example.backend.model.Actor;
+import com.example.backend.model.ActorMovieRelation;
+import com.example.backend.model.ActorMovieRelationRepository;
 import com.example.backend.model.ActorRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,9 +24,5 @@ public class ActorService {
 
     public List<Actor> getActorsByPrefix(String prefix) {
         return actorRepository.findByNameStartingWith(prefix);
-    }
-
-    public List<Actor> getActorsByMovieId(Long movieId) {
-        return actorRepository.findByMovieId(movieId);
     }
 }
