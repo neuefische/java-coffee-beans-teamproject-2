@@ -6,10 +6,11 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.NonNull;
 
+
 public record CreateMovieRequest(
         @NonNull String name,
-         boolean isWatched,
-        @Min(0) @Max(10) Double rating
+         @NonNull boolean isWatched,
+        @Min(Movie.MIN_RATING) @Max(Movie.MAX_RATING) Integer rating
 
 ) {
     public Movie toMovie() {

@@ -12,11 +12,13 @@ import java.util.Set;
 @With
 @Data
 public class Movie {
+    public static final int MIN_RATING = 0;
+    public static final int MAX_RATING = 10;
     @Id
     @GeneratedValue
     private Long id;
 
-    private Double rating;
+    private Integer rating;
 
     private boolean isWatched;
 
