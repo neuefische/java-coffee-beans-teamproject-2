@@ -99,6 +99,35 @@ class MovieControllerTest {
                 .andExpect(jsonPath("$[1].name").value(NAME_DEADPOOL));
 
     }
+    @Test
+    @DirtiesContext
+    void getMovie_By_ID_Test() throws Exception {
+        movieRepository.saveAll(
+                List.of(
+                        Movie.builder().name(NAME_MEMENTO).build(),
+                        Movie.builder().name(NAME_DEADPOOL).build()
+                )
+        );
+        mockMvc.perform(MockMvcRequestBuilders.get(URL_BASE + "/" + ID_FIRST))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.name").value(NAME_MEMENTO))
+                .andExpect(jsonPath("$.id").value(ID_FIRST));
+
+    }
+    @Test
+    @DirtiesContext
+    void getMovie_By_NonExistingID() throws Exception {
+        movieRepository.saveAll(
+                List.of(
+                        Movie.builder().name(NAME_MEMENTO).build(),
+                        Movie.builder().name(NAME_DEADPOOL).build()
+                )
+        );
+        mockMvc.perform(MockMvcRequestBuilders.get(URL_BASE + "/" + 3))
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
+
+    }
 
     @Test
     @DirtiesContext

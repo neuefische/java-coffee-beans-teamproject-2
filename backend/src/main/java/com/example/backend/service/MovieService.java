@@ -22,6 +22,13 @@ public class MovieService {
         return movieRepository.findAll();
     }
 
+    public Movie getMovieById(Long movieId) {
+        if (movieRepository.existsById(movieId)) {
+            return movieRepository.findById(movieId).get();
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Movie with id " + movieId + " does not exist");
+    }
+
     public void deleteMovie(Long movieId) {
         if (movieRepository.existsById(movieId)) {
             movieRepository.deleteById(movieId);

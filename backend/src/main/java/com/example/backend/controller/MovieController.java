@@ -1,11 +1,13 @@
 package com.example.backend.controller;
 
+import com.example.backend.dto.ActorResponse;
 import com.example.backend.dto.CreateMovieRequest;
 import com.example.backend.dto.MovieResponse;
 import com.example.backend.model.Movie;
 import com.example.backend.service.MovieService;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,8 +28,17 @@ public class MovieController {
     public List<MovieResponse> getAll(){
         return movieService.getAllMovies().stream().map(MovieResponse::from).collect(Collectors.toList());
     }
+
+    @GetMapping("/{movieId}")
+    public MovieResponse getByMovieId(@PathVariable @NonNull Long movieId) {
+        Movie searchedMovie = movieService.getMovieById(movieId);
+        return MovieResponse.from(searchedMovie);
+    }
+
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id){
     movieService.deleteMovie(id);
     }
+
+
 }
