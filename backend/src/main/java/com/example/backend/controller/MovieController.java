@@ -6,10 +6,10 @@ import com.example.backend.model.Movie;
 import com.example.backend.service.MovieService;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @AllArgsConstructor
@@ -21,5 +21,9 @@ public class MovieController {
     public MovieResponse save(@RequestBody @NotNull CreateMovieRequest movieRequest){
         Movie movie = movieRequest.toMovie();
         return MovieResponse.from(movieService.createMovie(movie));
+    }
+    @GetMapping
+    public List<MovieResponse> getAll(){
+        return movieService.getAllMovies().stream().map(MovieResponse::from).collect(Collectors.toList());
     }
 }
