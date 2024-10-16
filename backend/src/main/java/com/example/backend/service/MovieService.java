@@ -22,11 +22,22 @@ public class MovieService {
         return movieRepository.findAll();
     }
 
+    public Movie getMovieById(Long movieId) {
+        return movieRepository.findById(movieId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Movie with id " + movieId + " not found"));
+    }
+
     public void deleteMovie(Long movieId) {
         if (movieRepository.existsById(movieId)) {
             movieRepository.deleteById(movieId);
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Movie with id " + movieId + " does not exist");
         }
+    }
+    public Movie updateMovie(Movie movie) {
+        if (movieRepository.existsById(movie.getId())) {
+            return movieRepository.save(movie);
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Movie with id " + movie.getId() + " does not exist");
     }
 }
