@@ -26,4 +26,8 @@ public class MovieController {
     public List<MovieResponse> getAll(){
         return movieService.getAllMovies().stream().map(MovieResponse::from).collect(Collectors.toList());
     }
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id){
+    movieService.deleteMovie(id);
+    }
 }

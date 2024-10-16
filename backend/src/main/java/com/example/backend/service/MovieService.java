@@ -2,8 +2,12 @@ package com.example.backend.service;
 
 import com.example.backend.model.Movie;
 import com.example.backend.model.MovieRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.util.List;
 
 @Service
@@ -16,5 +20,13 @@ public class MovieService {
     }
     public List<Movie> getAllMovies() {
         return movieRepository.findAll();
+    }
+
+    public void deleteMovie(Long movieId) {
+        if (movieRepository.existsById(movieId)) {
+            movieRepository.deleteById(movieId);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Movie with id " + movieId + " does not exist");
+        }
     }
 }
