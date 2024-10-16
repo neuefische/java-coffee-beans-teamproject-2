@@ -1,6 +1,5 @@
 package com.example.backend.service;
 
-import com.example.backend.dto.CreateActorRequest;
 import com.example.backend.model.Actor;
 import com.example.backend.model.ActorRepository;
 import lombok.AllArgsConstructor;
