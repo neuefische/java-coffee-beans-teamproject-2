@@ -1,5 +1,6 @@
 package com.example.backend.service;
 
+import com.example.backend.model.Movie;
 import com.example.backend.model.MovieRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -8,4 +9,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class MovieService {
     private final MovieRepository movieRepository;
+
+    public Movie createMovie(Movie movie) {
+        return movieRepository.save(movie);
+    }
 }

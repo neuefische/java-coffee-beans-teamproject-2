@@ -7,6 +7,7 @@ import com.example.backend.service.ActorService;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/actor")
+@Validated
 public class ActorController {
     private final ActorService actorService;
 
