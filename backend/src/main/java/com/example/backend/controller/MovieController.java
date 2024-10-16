@@ -29,10 +29,17 @@ public class MovieController {
         return movieService.getAllMovies().stream().map(MovieResponse::from).collect(Collectors.toList());
     }
 
-    @GetMapping("/{movieId}")
-    public MovieResponse getByMovieId(@PathVariable @NonNull Long movieId) {
-        Movie searchedMovie = movieService.getMovieById(movieId);
+    @GetMapping("/{id}")
+    public MovieResponse getByMovieId(@PathVariable @NonNull Long id) {
+        Movie searchedMovie = movieService.getMovieById(id);
         return MovieResponse.from(searchedMovie);
+    }
+
+    @PutMapping("/{id}")
+    public MovieResponse update(@RequestBody @NotNull CreateMovieRequest movieRequest, @PathVariable Long id) {
+        Movie movie = movieRequest.toMovie();
+        movie.setId(id);
+        return MovieResponse.from(movieService.updateMovie(movie));
     }
 
     @DeleteMapping("/{id}")

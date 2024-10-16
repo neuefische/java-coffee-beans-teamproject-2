@@ -99,6 +99,7 @@ class MovieControllerTest {
                 .andExpect(jsonPath("$[1].name").value(NAME_DEADPOOL));
 
     }
+
     @Test
     @DirtiesContext
     void getMovie_By_ID_Test() throws Exception {
@@ -115,6 +116,7 @@ class MovieControllerTest {
                 .andExpect(jsonPath("$.id").value(ID_FIRST));
 
     }
+
     @Test
     @DirtiesContext
     void getMovie_By_NonExistingID() throws Exception {
@@ -127,6 +129,63 @@ class MovieControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get(URL_BASE + "/" + 3))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError());
 
+    }
+
+    @Test
+    @DirtiesContext
+    void updateMovie_Sucessfull() throws Exception {
+        movieRepository.saveAll(
+                List.of(
+                        Movie.builder().name(NAME_MEMENTO).build(),
+                        Movie.builder().name(NAME_DEADPOOL).build()
+                )
+        );
+        mockMvc.perform(MockMvcRequestBuilders.put(URL_BASE + "/" + ID_FIRST)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(
+                                """
+                                        {
+                                                "name": "Memento Edited",
+                                                "isWatched": true,
+                                                "rating": 10
+                                        }
+                                        """
+                        ))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+        mockMvc.perform(MockMvcRequestBuilders.get(URL_BASE))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].name").value("Memento Edited"))
+                .andExpect(jsonPath("$[1].name").value(NAME_DEADPOOL));
+    }
+    @Test
+    @DirtiesContext
+    void updateMovie_NonExistand_ID() throws Exception {
+        movieRepository.saveAll(
+                List.of(
+                        Movie.builder().name(NAME_MEMENTO).build(),
+                        Movie.builder().name(NAME_DEADPOOL).build()
+                )
+        );
+        mockMvc.perform(MockMvcRequestBuilders.put(URL_BASE + "/" + 3)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(
+                                """
+                                        {
+                                                "name": "Memento Edited",
+                                                "isWatched": true,
+                                                "rating": 10
+                                        }
+                                        """
+                        ))
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
+        mockMvc.perform(MockMvcRequestBuilders.get(URL_BASE))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].name").value(NAME_MEMENTO))
+                .andExpect(jsonPath("$[1].name").value(NAME_DEADPOOL));
     }
 
     @Test
@@ -146,6 +205,7 @@ class MovieControllerTest {
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].name").value(NAME_DEADPOOL));
     }
+
     @Test
     @DirtiesContext
     void deleteTest_NonExisting_ID() throws Exception {
