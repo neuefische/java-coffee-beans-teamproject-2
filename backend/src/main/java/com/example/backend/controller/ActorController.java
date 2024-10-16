@@ -5,6 +5,7 @@ import com.example.backend.dto.CreateActorRequest;
 import com.example.backend.model.Actor;
 import com.example.backend.service.ActorService;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,14 +21,13 @@ public class ActorController {
     @PostMapping
     public ActorResponse save(@RequestBody @NotNull CreateActorRequest request) {
         Actor actor = request.toActor();
-        actorService.createActor(actor);
 
-        return ActorResponse.from(actor);
+        return ActorResponse.from(actorService.createActor(actor));
     }
 
-    @GetMapping("/{id}")
-    public void get() {
-        // TODO
+    @GetMapping("/autocompletion/{prefix}")
+    public List<ActorResponse> getByName(@PathVariable @NonNull String prefix) {
+        return actorService.getActorsByPrefix(prefix).stream().map(ActorResponse::from).toList();
     }
 
     @PutMapping
