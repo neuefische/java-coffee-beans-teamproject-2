@@ -7,8 +7,10 @@ import com.example.backend.service.ActorService;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.http.HttpMethod;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.List;
 
@@ -30,6 +32,16 @@ public class ActorController {
     @GetMapping("/autocompletion/{prefix}")
     public List<ActorResponse> getByName(@PathVariable @NonNull String prefix) {
         return actorService.getActorsByPrefix(prefix).stream().map(ActorResponse::from).toList();
+    }
+
+    /**
+     * Prevents the frontend fallback response from being returned if the request path is invalid.
+     *
+     * @throws NoResourceFoundException
+     */
+    @GetMapping("/autocompletion/")
+    public void getByNameInvalid() throws NoResourceFoundException {
+        throw new NoResourceFoundException(HttpMethod.GET, "/api/actor/autocompletion/");
     }
 
     @PutMapping
