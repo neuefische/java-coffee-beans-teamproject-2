@@ -20,6 +20,14 @@ public class MovieService {
         return movieRepository.findAll();
     }
 
+    public List<Movie> getWatchedMovies() {
+        return movieRepository.findAllByIsWatchedIsTrue();
+    }
+
+    public List<Movie> getWishlistedMovies() {
+        return movieRepository.findAllByIsWatchedIsFalse();
+    }
+
     public Movie getMovieById(Long movieId) {
         return movieRepository.findById(movieId).orElseThrow();
     }
