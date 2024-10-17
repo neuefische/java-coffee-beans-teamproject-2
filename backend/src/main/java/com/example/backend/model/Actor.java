@@ -18,6 +18,5 @@ public class Actor {
     @GeneratedValue
     private Long id;
 
-    @Column(nullable = false)
     private String name;
 }

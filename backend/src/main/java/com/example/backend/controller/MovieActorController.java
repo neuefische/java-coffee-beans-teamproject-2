@@ -19,8 +19,13 @@ public class MovieActorController {
     private final MovieActorService movieActorService;
 
     @PostMapping()
-    public void addActorById(@RequestBody @NonNull MovieActorRequest movieActorRequest) {
+    public void addRelation(@RequestBody @NonNull MovieActorRequest movieActorRequest) {
         movieActorService.addActor(movieActorRequest.movieId(), movieActorRequest.actorId());
+    }
+
+    @DeleteMapping()
+    public void deleteRelation(@RequestBody @NonNull MovieActorRequest movieActorRequest) {
+        movieActorService.removeActor(movieActorRequest.movieId(), movieActorRequest.actorId());
     }
 
     @GetMapping("/{movieId}")
