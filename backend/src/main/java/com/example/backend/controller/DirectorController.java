@@ -19,23 +19,24 @@ public class DirectorController {
     private final DirectorService directorService;
 
     @PostMapping
-    public DirectorResponse save(@RequestBody @Valid @NotNull CreateDirectorRequest directorRequest){
+    public DirectorResponse save(@RequestBody @Valid @NotNull CreateDirectorRequest directorRequest) {
         Director director = directorRequest.toDirector();
         return DirectorResponse.from(directorService.createDirector(director));
     }
+
     @GetMapping
-    public List<DirectorResponse> getAll(){
+    public List<DirectorResponse> getAll() {
         return directorService.getAllDirectors().stream().map(DirectorResponse::from).collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
-    public DirectorResponse getDirectorByMovieId(@PathVariable @NonNull Long id) {
+    public DirectorResponse getDirectorById(@PathVariable @NonNull Long id) {
         Director searchedMovie = directorService.getDirectorById(id);
         return DirectorResponse.from(searchedMovie);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id){
+    public void delete(@PathVariable Long id) {
         directorService.deleteDirector(id);
     }
 }

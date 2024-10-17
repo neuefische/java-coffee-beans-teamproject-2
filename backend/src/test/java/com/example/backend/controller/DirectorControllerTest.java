@@ -96,7 +96,7 @@ class DirectorControllerTest {
 
     @Test
     @DirtiesContext
-    void getDirectorByMovieId() throws Exception {
+    void getDirectorById() throws Exception {
         directorRepository.saveAll(
                 List.of(
                         Director.builder().name(DIRECTOR_ONE).build(),
@@ -112,7 +112,7 @@ class DirectorControllerTest {
     }
     @Test
     @DirtiesContext
-    void getDirectorByMovieId_NonExisting_ID() throws Exception {
+    void getDirectorById_NonExisting_ID() throws Exception {
         directorRepository.saveAll(
                 List.of(
                         Director.builder().name(DIRECTOR_ONE).build(),
