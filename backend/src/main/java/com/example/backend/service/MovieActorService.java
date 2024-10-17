@@ -27,4 +27,12 @@ public class MovieActorService {
         Actor actor = actorRepository.findById(actorId).orElseThrow();
         movieActorRelationRepository.save(MovieActorRelation.builder().actor(actor).movie(movie).actor(actor).build());
     }
+
+    public void removeActor(Long movieId, Long actorId) {
+        MovieActorRelation relation = movieActorRelationRepository
+                .findByMovieIdAndActorId(actorId, movieId)
+                .orElseThrow();
+
+        movieActorRelationRepository.delete(relation);
+    }
 }

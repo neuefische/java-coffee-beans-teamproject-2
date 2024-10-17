@@ -16,6 +16,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @SpringBootTest
@@ -42,7 +43,7 @@ class MovieActorControllerTest {
     private ActorRepository actorRepository;
 
     @Autowired
-    private MovieActorRelationRepository actorMovieRelationRepository;
+    private MovieActorRelationRepository movieActorRelationRepository;
 
     @Test
     @DirtiesContext
@@ -55,7 +56,7 @@ class MovieActorControllerTest {
         Actor actorJohn = Actor.builder().name(ACTOR_NAME_JOHN).build();
         movieRepository.saveAll(List.of(movieFirst, movieSecond));
         actorRepository.saveAll(List.of(actorJane, actorJim, actorJoe, actorJohn));
-        actorMovieRelationRepository.saveAll(
+        movieActorRelationRepository.saveAll(
                 List.of(
                         MovieActorRelation.builder().actor(actorJane).movie(movieFirst).build(),
                         MovieActorRelation.builder().actor(actorJoe).movie(movieSecond).build(),
@@ -85,7 +86,7 @@ class MovieActorControllerTest {
         Actor actorJohn = Actor.builder().name(ACTOR_NAME_JOHN).build();
         movieRepository.saveAll(List.of(movieFirst, movieSecond));
         actorRepository.saveAll(List.of(actorJane, actorJim, actorJoe, actorJohn));
-        actorMovieRelationRepository.saveAll(
+        movieActorRelationRepository.saveAll(
                 List.of(
                         MovieActorRelation.builder().actor(actorJane).movie(movieFirst).build(),
                         MovieActorRelation.builder().actor(actorJoe).movie(movieFirst).build(),
@@ -126,7 +127,7 @@ class MovieActorControllerTest {
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
-        List<MovieActorRelation> actualActorIdList = actorMovieRelationRepository.findByMovieId(movie.getId());
+        List<MovieActorRelation> actualActorIdList = movieActorRelationRepository.findByMovieId(movie.getId());
         assertEquals(1, actualActorIdList.size());
         assertEquals(actor.getId(), actualActorIdList.getFirst().getActor().getId());
     }
@@ -138,7 +139,7 @@ class MovieActorControllerTest {
         Actor actor = Actor.builder().name(ACTOR_NAME_JANE).build();
         movieRepository.save(movie);
         actorRepository.save(actor);
-        actorMovieRelationRepository.save(MovieActorRelation.builder().actor(actor).movie(movie).build());
+        movieActorRelationRepository.save(MovieActorRelation.builder().actor(actor).movie(movie).build());
 
         mockMvc.perform(MockMvcRequestBuilders.post(URL_BASE)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -195,6 +196,71 @@ class MovieActorControllerTest {
                                         """.formatted(actor.getId(), nonExistentMovieId)
                         ))
 
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
+    }
+
+    @Test
+    @DirtiesContext
+    void removeActor_successful() throws Exception {
+        Movie movieFirst = Movie.builder().name(MOVIE_NAME_MEMENTO).build();
+        Movie movieSecond = Movie.builder().name(MOVIE_NAME_MEMENTO).build();
+        Actor actorJane = Actor.builder().name(ACTOR_NAME_JANE).build();
+        Actor actorJim = Actor.builder().name(ACTOR_NAME_JANE).build();
+        movieRepository.save(movieFirst);
+        movieRepository.save(movieSecond);
+        actorRepository.save(actorJane);
+        actorRepository.save(actorJim);
+        movieActorRelationRepository.save(MovieActorRelation.builder().actor(actorJane).movie(movieFirst).build());
+        movieActorRelationRepository.save(MovieActorRelation.builder().actor(actorJim).movie(movieFirst).build());
+        movieActorRelationRepository.save(MovieActorRelation.builder().actor(actorJane).movie(movieSecond).build());
+        movieActorRelationRepository.save(MovieActorRelation.builder().actor(actorJim).movie(movieSecond).build());
+
+        mockMvc.perform(MockMvcRequestBuilders.delete(URL_BASE)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(
+                                """
+                                         {
+                                              "actorId": "%s",
+                                              "movieId": "%s"
+                                         }
+                                        """.formatted(actorJane.getId(), movieFirst.getId())
+                        ))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        assertTrue(
+                movieActorRelationRepository.findByMovieIdAndActorId(movieFirst.getId(), actorJane.getId()).isEmpty()
+        );
+        assertEquals(
+                3,
+                movieActorRelationRepository.findAll().size()
+        );
+    }
+
+    @Test
+    @DirtiesContext
+    void removeActor_noSuchRelation() throws Exception {
+        Movie movieFirst = Movie.builder().name(MOVIE_NAME_MEMENTO).build();
+        Movie movieSecond = Movie.builder().name(MOVIE_NAME_MEMENTO).build();
+        Actor actorJane = Actor.builder().name(ACTOR_NAME_JANE).build();
+        Actor actorJim = Actor.builder().name(ACTOR_NAME_JANE).build();
+        movieRepository.save(movieFirst);
+        movieRepository.save(movieSecond);
+        actorRepository.save(actorJane);
+        actorRepository.save(actorJim);
+        movieActorRelationRepository.save(MovieActorRelation.builder().actor(actorJim).movie(movieFirst).build());
+        movieActorRelationRepository.save(MovieActorRelation.builder().actor(actorJane).movie(movieSecond).build());
+        movieActorRelationRepository.save(MovieActorRelation.builder().actor(actorJim).movie(movieSecond).build());
+
+        mockMvc.perform(MockMvcRequestBuilders.delete(URL_BASE)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(
+                                """
+                                         {
+                                              "actorId": "%s",
+                                              "movieId": "%s"
+                                         }
+                                        """.formatted(actorJane.getId(), movieFirst.getId())
+                        ))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError());
     }
 }
