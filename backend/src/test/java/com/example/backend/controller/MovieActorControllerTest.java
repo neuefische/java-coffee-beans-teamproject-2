@@ -20,8 +20,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class ActorMovieControllerTest {
-    private static final String URL_ACTOR_MOVIE_BASE = "/api/actor-movie/{movieId}";
+class MovieActorControllerTest {
+    private static final String URL_BASE = "/api/movie-actor";
+    private static final String URL_WITH_ID = "/api/movie-actor/{movieId}";
 
     private static final String ACTOR_NAME_JANE = "Jane Doe";
     private static final String ACTOR_NAME_JIM = "Jim Doe";
@@ -41,7 +42,7 @@ class ActorMovieControllerTest {
     private ActorRepository actorRepository;
 
     @Autowired
-    private ActorMovieRelationRepository actorMovieRelationRepository;
+    private MovieActorRelationRepository actorMovieRelationRepository;
 
     @Test
     @DirtiesContext
@@ -56,14 +57,14 @@ class ActorMovieControllerTest {
         actorRepository.saveAll(List.of(actorJane, actorJim, actorJoe, actorJohn));
         actorMovieRelationRepository.saveAll(
                 List.of(
-                        ActorMovieRelation.builder().actor(actorJane).movie(movieFirst).build(),
-                        ActorMovieRelation.builder().actor(actorJoe).movie(movieSecond).build(),
-                        ActorMovieRelation.builder().actor(actorJim).movie(movieSecond).build(),
-                        ActorMovieRelation.builder().actor(actorJane).movie(movieSecond).build()
+                        MovieActorRelation.builder().actor(actorJane).movie(movieFirst).build(),
+                        MovieActorRelation.builder().actor(actorJoe).movie(movieSecond).build(),
+                        MovieActorRelation.builder().actor(actorJim).movie(movieSecond).build(),
+                        MovieActorRelation.builder().actor(actorJane).movie(movieSecond).build()
                 )
         );
 
-        mockMvc.perform(MockMvcRequestBuilders.get(URL_ACTOR_MOVIE_BASE, movieSecond.getId()))
+        mockMvc.perform(MockMvcRequestBuilders.get(URL_WITH_ID, movieSecond.getId()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(jsonPath("$", hasSize(3)))
                 .andExpect(jsonPath("$[*].name", containsInAnyOrder(
@@ -86,21 +87,21 @@ class ActorMovieControllerTest {
         actorRepository.saveAll(List.of(actorJane, actorJim, actorJoe, actorJohn));
         actorMovieRelationRepository.saveAll(
                 List.of(
-                        ActorMovieRelation.builder().actor(actorJane).movie(movieFirst).build(),
-                        ActorMovieRelation.builder().actor(actorJoe).movie(movieFirst).build(),
-                        ActorMovieRelation.builder().actor(actorJim).movie(movieFirst).build(),
-                        ActorMovieRelation.builder().actor(actorJohn).movie(movieFirst).build()
+                        MovieActorRelation.builder().actor(actorJane).movie(movieFirst).build(),
+                        MovieActorRelation.builder().actor(actorJoe).movie(movieFirst).build(),
+                        MovieActorRelation.builder().actor(actorJim).movie(movieFirst).build(),
+                        MovieActorRelation.builder().actor(actorJohn).movie(movieFirst).build()
                 )
         );
 
-        mockMvc.perform(MockMvcRequestBuilders.get(URL_ACTOR_MOVIE_BASE, movieSecond.getId()))
+        mockMvc.perform(MockMvcRequestBuilders.get(URL_WITH_ID, movieSecond.getId()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(jsonPath("$", hasSize(0)));
     }
 
     @Test
     void getByMovieIdTest_emptyRequest() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get(URL_ACTOR_MOVIE_BASE, ""))
+        mockMvc.perform(MockMvcRequestBuilders.get(URL_WITH_ID, ""))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError());
     }
 
@@ -112,19 +113,20 @@ class ActorMovieControllerTest {
         movieRepository.save(movie);
         actorRepository.save(actor);
 
-        mockMvc.perform(MockMvcRequestBuilders.post(URL_ACTOR_MOVIE_BASE, movie.getId())
+        mockMvc.perform(MockMvcRequestBuilders.post(URL_BASE)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(
                                 """
                                          {
-                                              "id": "%s"
+                                              "actorId": "%s",
+                                              "movieId": "%s"
                                          }
-                                        """.formatted(actor.getId())
+                                        """.formatted(actor.getId(), movie.getId())
                         )
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
-        List<ActorMovieRelation> actualActorIdList = actorMovieRelationRepository.findByMovieId(movie.getId());
+        List<MovieActorRelation> actualActorIdList = actorMovieRelationRepository.findByMovieId(movie.getId());
         assertEquals(1, actualActorIdList.size());
         assertEquals(actor.getId(), actualActorIdList.getFirst().getActor().getId());
     }
@@ -136,16 +138,17 @@ class ActorMovieControllerTest {
         Actor actor = Actor.builder().name(ACTOR_NAME_JANE).build();
         movieRepository.save(movie);
         actorRepository.save(actor);
-        actorMovieRelationRepository.save(ActorMovieRelation.builder().actor(actor).movie(movie).build());
+        actorMovieRelationRepository.save(MovieActorRelation.builder().actor(actor).movie(movie).build());
 
-        mockMvc.perform(MockMvcRequestBuilders.post(URL_ACTOR_MOVIE_BASE, movie.getId())
+        mockMvc.perform(MockMvcRequestBuilders.post(URL_BASE)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(
                                 """
                                          {
-                                              "id": "%s"
+                                              "actorId": "%s",
+                                              "movieId": "%s"
                                          }
-                                        """.formatted(actor.getId())
+                                        """.formatted(actor.getId(), movie.getId())
                         ))
                 .andExpect(MockMvcResultMatchers.status().is5xxServerError());
     }
@@ -159,14 +162,15 @@ class ActorMovieControllerTest {
         actorRepository.save(actor);
         Long nonExistentActorId = actor.getId() + 1;
 
-        mockMvc.perform(MockMvcRequestBuilders.post(URL_ACTOR_MOVIE_BASE, movie.getId())
+        mockMvc.perform(MockMvcRequestBuilders.post(URL_BASE)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(
                                 """
                                          {
-                                              "id": "%s"
+                                              "actorId": "%s",
+                                              "movieId": "%s",
                                          }
-                                        """.formatted(nonExistentActorId)
+                                        """.formatted(nonExistentActorId, movie.getId())
                         ))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError());
     }
@@ -180,14 +184,15 @@ class ActorMovieControllerTest {
         actorRepository.save(actor);
         Long nonExistentMovieId = movie.getId() + 1L;
 
-        mockMvc.perform(MockMvcRequestBuilders.post(URL_ACTOR_MOVIE_BASE, nonExistentMovieId)
+        mockMvc.perform(MockMvcRequestBuilders.post(URL_BASE)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(
                                 """
                                          {
-                                              "id": "%s"
+                                              "actorId": "%s",
+                                              "movieId": "%s"
                                          }
-                                        """.formatted(actor.getId())
+                                        """.formatted(actor.getId(), nonExistentMovieId)
                         ))
 
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError());

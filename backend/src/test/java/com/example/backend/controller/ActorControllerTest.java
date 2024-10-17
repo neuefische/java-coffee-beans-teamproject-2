@@ -41,7 +41,7 @@ class ActorControllerTest {
     private MovieRepository movieRepository;
 
     @Autowired
-    private ActorMovieRelationRepository actorMovieRelationRepository;
+    private MovieActorRelationRepository movieActorRelationRepository;
 
     @Test
     @DirtiesContext

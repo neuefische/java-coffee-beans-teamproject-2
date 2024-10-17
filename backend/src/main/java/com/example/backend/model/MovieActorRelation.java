@@ -14,7 +14,7 @@ import lombok.*;
                 @UniqueConstraint(columnNames = {"actor_id", "movie_id"})
         }
 )
-public class ActorMovieRelation {
+public class MovieActorRelation {
     @Id
     @GeneratedValue
     private Long id;

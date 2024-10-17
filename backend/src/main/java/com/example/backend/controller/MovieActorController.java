@@ -1,8 +1,8 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.ActorResponse;
-import com.example.backend.dto.IdRequest;
-import com.example.backend.service.ActorMovieService;
+import com.example.backend.dto.MovieActorRequest;
+import com.example.backend.service.MovieActorService;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.http.HttpMethod;
@@ -13,19 +13,19 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/actor-movie")
-public class ActorMovieController {
+@RequestMapping("/api/movie-actor")
+public class MovieActorController {
 
-    private final ActorMovieService actorMovieService;
+    private final MovieActorService movieActorService;
 
-    @PostMapping("/{movieId}")
-    public void addActorById(@PathVariable @NonNull Long movieId, @RequestBody IdRequest idRequest) {
-        actorMovieService.addActor(movieId, idRequest.id());
+    @PostMapping()
+    public void addActorById(@RequestBody @NonNull MovieActorRequest movieActorRequest) {
+        movieActorService.addActor(movieActorRequest.movieId(), movieActorRequest.actorId());
     }
 
     @GetMapping("/{movieId}")
     public List<ActorResponse> getActorsByMovieId(@PathVariable @NonNull Long movieId) {
-        return actorMovieService.getActorsByMovieId(movieId).stream().map(ActorResponse::from).toList();
+        return movieActorService.getActorsByMovieId(movieId).stream().map(ActorResponse::from).toList();
     }
 
     /**
