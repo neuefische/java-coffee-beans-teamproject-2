@@ -3,6 +3,7 @@ package com.example.backend.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -17,9 +18,5 @@ public class Actor {
     @GeneratedValue
     private Long id;
 
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.EAGER)
-    private Set<Movie> movies;
-
-    @Column(nullable = false)
     private String name;
 }

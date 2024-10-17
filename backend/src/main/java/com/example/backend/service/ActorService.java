@@ -23,8 +23,4 @@ public class ActorService {
     public List<Actor> getActorsByPrefix(String prefix) {
         return actorRepository.findByNameStartingWith(prefix);
     }
-
-    public List<Actor> getActorsByMovieId(Long movieId) {
-        return actorRepository.findByMovieId(movieId);
-    }
 }
