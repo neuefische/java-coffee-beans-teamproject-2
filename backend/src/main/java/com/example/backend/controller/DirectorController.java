@@ -2,9 +2,8 @@ package com.example.backend.controller;
 
 import com.example.backend.dto.*;
 import com.example.backend.model.Director;
-import com.example.backend.model.Movie;
 import com.example.backend.service.DirectorService;
-import com.example.backend.service.MovieService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -20,7 +19,7 @@ public class DirectorController {
     private final DirectorService directorService;
 
     @PostMapping
-    public DirectorResponse save(@RequestBody @NotNull CreateDirectorRequest directorRequest){
+    public DirectorResponse save(@RequestBody @Valid @NotNull CreateDirectorRequest directorRequest){
         Director director = directorRequest.toDirector();
         return DirectorResponse.from(directorService.createDirector(director));
     }
@@ -30,7 +29,7 @@ public class DirectorController {
     }
 
     @GetMapping("/{id}")
-    public DirectorResponse getByMovieId(@PathVariable @NonNull Long id) {
+    public DirectorResponse getDirectorByMovieId(@PathVariable @NonNull Long id) {
         Director searchedMovie = directorService.getDirectorById(id);
         return DirectorResponse.from(searchedMovie);
     }
