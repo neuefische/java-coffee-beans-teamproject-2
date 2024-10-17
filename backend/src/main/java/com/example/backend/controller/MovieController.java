@@ -1,6 +1,5 @@
 package com.example.backend.controller;
 
-import com.example.backend.dto.ActorResponse;
 import com.example.backend.dto.CreateMovieRequest;
 import com.example.backend.dto.MovieResponse;
 import com.example.backend.model.Movie;
@@ -46,5 +45,15 @@ public class MovieController {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id){
     movieService.deleteMovie(id);
+    }
+
+    @GetMapping("/watched")
+    public List<MovieResponse> getWatchedMovies() {
+        return movieService.getWatchedMovies().stream().map(MovieResponse::from).collect(Collectors.toList());
+    }
+
+    @GetMapping("/wishlist")
+    public List<MovieResponse> getWishlistedMovies() {
+        return movieService.getWishlistedMovies().stream().map(MovieResponse::from).collect(Collectors.toList());
     }
 }
