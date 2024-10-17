@@ -1,11 +1,6 @@
 package com.example.backend.controller;
 
-import com.example.backend.dto.MovieResponse;
-import org.junit.jupiter.api.Test;
-import com.example.backend.model.Actor;
-import com.example.backend.model.ActorRepository;
-import com.example.backend.model.Movie;
-import com.example.backend.model.MovieRepository;
+import com.example.backend.model.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -17,23 +12,17 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.List;
-import java.util.Set;
 
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 class MovieControllerTest {
     private static final String URL_BASE = "/api/movie";
 
-
     private static final long ID_FIRST = 1L;
-    private static final long ID_SECOND = 2L;
 
     private static final String NAME_MEMENTO = "Memento";
     private static final String NAME_DEADPOOL = "Deadpool";
@@ -43,7 +32,6 @@ class MovieControllerTest {
 
     @Autowired
     private MovieRepository movieRepository;
-
 
     @Test
     @DirtiesContext
@@ -60,7 +48,7 @@ class MovieControllerTest {
                         ))
                 .andExpect(MockMvcResultMatchers.status().isOk());
         List<Movie> actualMovies = movieRepository.findAll();
-        List<Movie> expectedMovies = List.of(Movie.builder().id(ID_FIRST).name(NAME_MEMENTO).isWatched(true).actors(Set.of()).directors(Set.of()).build());
+        List<Movie> expectedMovies = List.of(Movie.builder().id(ID_FIRST).name(NAME_MEMENTO).isWatched(true).build());
         assertEquals(expectedMovies, actualMovies);
     }
 

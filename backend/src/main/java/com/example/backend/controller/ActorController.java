@@ -44,21 +44,6 @@ public class ActorController {
         throw new NoResourceFoundException(HttpMethod.GET, "/api/actor/autocompletion/");
     }
 
-    @GetMapping("/movie/{movieId}")
-    public List<ActorResponse> getByMovieId(@PathVariable @NonNull Long movieId) {
-        return actorService.getActorsByMovieId(movieId).stream().map(ActorResponse::from).toList();
-    }
-
-    /**
-     * Prevents the frontend fallback response from being returned if the request path is invalid.
-     *
-     * @throws NoResourceFoundException
-     */
-    @GetMapping("/movie/")
-    public void getByMovieIdInvalid() throws NoResourceFoundException {
-        throw new NoResourceFoundException(HttpMethod.GET, "/api/actor/movie/");
-    }
-
     @PutMapping
     public void update() {
         // TODO
