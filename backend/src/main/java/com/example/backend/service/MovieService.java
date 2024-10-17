@@ -25,8 +25,9 @@ public class MovieService {
     }
 
     public void deleteMovie(Long movieId) {
-        movieRepository.findById(movieId).orElseThrow();
-        movieRepository.deleteById(movieId);
+        Movie movie = movieRepository.findById(movieId).orElseThrow();
+
+        movieRepository.delete(movie);
     }
 
     public Movie updateMovie(Movie movie) {
