@@ -1,6 +1,6 @@
 package com.example.backend.controller;
 
-
+import com.example.backend.dto.DirectorResponse;
 import com.example.backend.dto.MovieDirectorRequest;
 import com.example.backend.dto.MovieDirectorResponse;
 import com.example.backend.model.MovieDirectorRelation;
@@ -10,6 +10,8 @@ import lombok.NonNull;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -30,6 +32,11 @@ public class MovieDirectorController {
         movieDirectorService.removeRelation(movieDirectorRequest.movieId(), movieDirectorRequest.directorId());
     }
 
+    @GetMapping("/{movieId}")
+    public List<DirectorResponse> getActorsByMovieId(@PathVariable @NonNull String movieId) {
+        return movieDirectorService.getDirectorsByMovieId(movieId).stream().map(DirectorResponse::from).toList();
+    }
+
     /**
      * Prevents the frontend fallback response from being returned if the request path is invalid.
      *
@@ -37,6 +44,6 @@ public class MovieDirectorController {
      */
     @GetMapping("/")
     public void getByMovieIdInvalid() throws NoResourceFoundException {
-        throw new NoResourceFoundException(HttpMethod.GET, "/api/actor-movie/");
+        throw new NoResourceFoundException(HttpMethod.GET, "/api/movie-director/");
     }
 }

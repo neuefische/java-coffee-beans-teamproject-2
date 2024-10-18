@@ -44,6 +44,6 @@ public class MovieActorController {
      */
     @GetMapping("/")
     public void getByMovieIdInvalid() throws NoResourceFoundException {
-        throw new NoResourceFoundException(HttpMethod.GET, "/api/actor-movie/");
+        throw new NoResourceFoundException(HttpMethod.GET, "/api/movie-actor/");
     }
 }
