@@ -9,7 +9,7 @@ import lombok.NonNull;
 
 public record CreateMovieRequest(
         @NonNull String name,
-         @NonNull boolean isWatched,
+        boolean isWatched,
         @Min(Movie.MIN_RATING) @Max(Movie.MAX_RATING) Integer rating
 
 ) {

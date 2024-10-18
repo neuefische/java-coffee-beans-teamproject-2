@@ -11,26 +11,38 @@ import java.util.List;
 public class MovieActorService {
     private final MovieActorRelationRepository movieActorRelationRepository;
 
+    private final IdService idService;
+
     private final ActorRepository actorRepository;
 
     private final MovieRepository movieRepository;
 
-    public List<Actor> getActorsByMovieId(Long movieId) {
+    public List<Actor> getActorsByMovieId(String movieId) {
         return movieActorRelationRepository.findByMovieId(movieId)
                 .stream()
-                .map(MovieActorRelation::getActor)
+                .map(MovieActorRelation::getActorId)
+                .map(id -> actorRepository.findById(id).orElseThrow())
                 .toList();
     }
 
-    public void addActor(Long movieId, Long actorId) {
-        Movie movie = movieRepository.findById(movieId).orElseThrow();
-        Actor actor = actorRepository.findById(actorId).orElseThrow();
-        movieActorRelationRepository.save(MovieActorRelation.builder().actor(actor).movie(movie).actor(actor).build());
+    public MovieActorRelation addActor(String movieId, String actorId) {
+        return movieActorRelationRepository
+                .findByMovieIdAndActorId(actorId, movieId).orElseGet(
+                        () -> {
+                            Movie movie = movieRepository.findById(movieId).orElseThrow();
+                            Actor actor = actorRepository.findById(actorId).orElseThrow();
+                            return movieActorRelationRepository.save(MovieActorRelation.builder()
+                                    .id(idService.getRandomId())
+                                    .movieId(movie.getId())
+                                    .actorId(actor.getId())
+                                    .build());
+                        }
+                );
     }
 
-    public void removeActor(Long movieId, Long actorId) {
+    public void removeActor(String movieId, String actorId) {
         MovieActorRelation relation = movieActorRelationRepository
-                .findByMovieIdAndActorId(actorId, movieId)
+                .findByMovieIdAndActorId(movieId, actorId)
                 .orElseThrow();
 
         movieActorRelationRepository.delete(relation);

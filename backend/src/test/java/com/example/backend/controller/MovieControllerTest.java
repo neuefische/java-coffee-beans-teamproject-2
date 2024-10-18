@@ -24,7 +24,7 @@ class MovieControllerTest {
     private static final String URL_WATCHED = "/api/movie/watched";
     private static final String URL_WISHLIST = "/api/movie/wishlist";
 
-    private static final long ID_FIRST = 1L;
+    private static final String ID_FIRST = "1";
 
     private static final String NAME_FIRST = "Memento";
     private static final String NAME_SECOND = "Deadpool";
@@ -54,8 +54,9 @@ class MovieControllerTest {
                         ))
                 .andExpect(MockMvcResultMatchers.status().isOk());
         List<Movie> actualMovies = movieRepository.findAll();
-        List<Movie> expectedMovies = List.of(Movie.builder().id(ID_FIRST).name(NAME_FIRST).isWatched(true).build());
-        assertEquals(expectedMovies, actualMovies);
+        assertEquals(1, actualMovies.size());
+        assertEquals(NAME_FIRST, actualMovies.getFirst().getName());
+        assertEquals(true, actualMovies.getFirst().isWatched());
     }
 
     @Test
@@ -97,17 +98,15 @@ class MovieControllerTest {
     @Test
     @DirtiesContext
     void getMovie_By_ID_Test() throws Exception {
-        movieRepository.saveAll(
-                List.of(
-                        Movie.builder().name(NAME_FIRST).build(),
-                        Movie.builder().name(NAME_SECOND).build()
-                )
-        );
-        mockMvc.perform(MockMvcRequestBuilders.get(URL_BASE + "/" + ID_FIRST))
+        Movie firstMovie = Movie.builder().name(NAME_FIRST).build();
+        Movie secondMovie = Movie.builder().name(NAME_SECOND).build();
+
+        movieRepository.saveAll(List.of(firstMovie, secondMovie));
+        mockMvc.perform(MockMvcRequestBuilders.get(URL_BASE + "/" + firstMovie.getId()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.name").value(NAME_FIRST))
-                .andExpect(jsonPath("$.id").value(ID_FIRST));
+                .andExpect(jsonPath("$.id").value(firstMovie.getId()));
 
     }
 
@@ -128,13 +127,11 @@ class MovieControllerTest {
     @Test
     @DirtiesContext
     void updateMovie_Sucessfull() throws Exception {
-        movieRepository.saveAll(
-                List.of(
-                        Movie.builder().name(NAME_FIRST).build(),
-                        Movie.builder().name(NAME_SECOND).build()
-                )
-        );
-        mockMvc.perform(MockMvcRequestBuilders.put(URL_BASE + "/" + ID_FIRST)
+        Movie firstMovie = Movie.builder().name(NAME_FIRST).build();
+        Movie secondMovie = Movie.builder().name(NAME_SECOND).build();
+        movieRepository.saveAll(List.of(firstMovie, secondMovie));
+
+        mockMvc.perform(MockMvcRequestBuilders.put(URL_BASE + "/" + firstMovie.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(
                                 """
@@ -185,13 +182,16 @@ class MovieControllerTest {
     @Test
     @DirtiesContext
     void deleteTest_Successful() throws Exception {
+        Movie firstMovie = Movie.builder().name(NAME_FIRST).build();
+        Movie secondMovie = Movie.builder().name(NAME_SECOND).build();
+
         movieRepository.saveAll(
                 List.of(
-                        Movie.builder().name(NAME_FIRST).build(),
-                        Movie.builder().name(NAME_SECOND).build()
+                        firstMovie,
+                        secondMovie
                 )
         );
-        mockMvc.perform(MockMvcRequestBuilders.delete(URL_BASE + "/" + ID_FIRST))
+        mockMvc.perform(MockMvcRequestBuilders.delete(URL_BASE + "/" + firstMovie.getId()))
                 .andExpect(MockMvcResultMatchers.status().isOk());
         mockMvc.perform(MockMvcRequestBuilders.get(URL_BASE))
                 .andExpect(MockMvcResultMatchers.status().isOk())

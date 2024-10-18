@@ -2,5 +2,5 @@ package com.example.backend.dto;
 
 import lombok.NonNull;
 
-public record MovieDirectorRequest(@NonNull Long movieId, @NonNull Long directorId) {
+public record MovieDirectorRequest(@NonNull Long movieId, @NonNull String directorId) {
 }
