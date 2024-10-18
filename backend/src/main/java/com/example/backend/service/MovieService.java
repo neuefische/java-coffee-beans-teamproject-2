@@ -38,13 +38,11 @@ public class MovieService {
 
     public void deleteMovie(String movieId) {
         Movie movie = movieRepository.findById(movieId).orElseThrow();
-
         movieRepository.delete(movie);
     }
 
     public Movie updateMovie(Movie movie) {
         movieRepository.findById(movie.getId()).orElseThrow();
-
         return movieRepository.save(movie);
     }
 }
