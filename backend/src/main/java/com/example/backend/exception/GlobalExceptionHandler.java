@@ -2,18 +2,19 @@ package com.example.backend.exception;
 
 import com.example.backend.dto.ErrorResponse;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.NoSuchElementException;
 
-@ControllerAdvice
+@RestControllerAdvice
 @Log4j2
 public class GlobalExceptionHandler {
     private static final String GENERIC_ERROR_MESSAGE = "Something went wrong";
@@ -51,6 +52,13 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleValidationException(ResponseStatusException exception) {
         log.info(exception.getMessage());
         return new ErrorResponse(exception.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleDataIntegrityViolationException(DataIntegrityViolationException exception) {
+        log.info("Data integrity violation: " + exception.getMessage());
+        return new ErrorResponse("Data integrity violation: duplicate entry or constraint violation.");
     }
 
     @ExceptionHandler

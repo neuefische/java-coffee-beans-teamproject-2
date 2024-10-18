@@ -152,6 +152,9 @@ class MovieActorControllerTest {
                                         """.formatted(actor.getId(), movie.getId())
                         ))
                 .andExpect(MockMvcResultMatchers.status().isOk());
+
+        int relationCount = movieActorRelationRepository.findAll().size();
+        assertEquals(1, relationCount);
     }
 
     @Test

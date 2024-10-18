@@ -27,7 +27,7 @@ public class MovieActorService {
 
     public MovieActorRelation addActor(String movieId, String actorId) {
         return movieActorRelationRepository
-                .findByMovieIdAndActorId(actorId, movieId).orElseGet(
+                .findByMovieIdAndActorId(movieId, actorId).orElseGet(
                         () -> {
                             Movie movie = movieRepository.findById(movieId).orElseThrow();
                             Actor actor = actorRepository.findById(actorId).orElseThrow();

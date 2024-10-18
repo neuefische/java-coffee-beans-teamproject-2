@@ -2,6 +2,7 @@ package com.example.backend.controller;
 
 import com.example.backend.dto.ActorResponse;
 import com.example.backend.dto.MovieActorRequest;
+import com.example.backend.dto.MovieActorResponse;
 import com.example.backend.model.MovieActorRelation;
 import com.example.backend.service.MovieActorService;
 import lombok.AllArgsConstructor;
@@ -20,8 +21,10 @@ public class MovieActorController {
     private final MovieActorService movieActorService;
 
     @PostMapping()
-    public MovieActorRelation addRelation(@RequestBody @NonNull MovieActorRequest movieActorRequest) {
-        return movieActorService.addActor(movieActorRequest.movieId(), movieActorRequest.actorId());
+    public MovieActorResponse addRelation(@RequestBody @NonNull MovieActorRequest movieActorRequest) {
+        MovieActorRelation relation = movieActorService.addActor(movieActorRequest.movieId(), movieActorRequest.actorId());
+
+        return MovieActorResponse.from(relation);
     }
 
     @DeleteMapping()
