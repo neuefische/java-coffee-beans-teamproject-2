@@ -12,7 +12,11 @@ import java.util.List;
 public class MovieService {
     private final MovieRepository movieRepository;
 
+    private final IdService idService;
+
     public Movie createMovie(Movie movie) {
+        movie.setId(idService.getRandomId());
+
         return movieRepository.save(movie);
     }
 
@@ -28,11 +32,11 @@ public class MovieService {
         return movieRepository.findAllByIsWatchedIsFalse();
     }
 
-    public Movie getMovieById(Long movieId) {
+    public Movie getMovieById(String movieId) {
         return movieRepository.findById(movieId).orElseThrow();
     }
 
-    public void deleteMovie(Long movieId) {
+    public void deleteMovie(String movieId) {
         Movie movie = movieRepository.findById(movieId).orElseThrow();
 
         movieRepository.delete(movie);

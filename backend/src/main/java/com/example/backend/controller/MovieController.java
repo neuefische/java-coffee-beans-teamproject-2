@@ -30,21 +30,21 @@ public class MovieController {
     }
 
     @GetMapping("/{id}")
-    public MovieResponse getByMovieId(@PathVariable @NonNull Long id) {
+    public MovieResponse getByMovieId(@PathVariable @NonNull String id) {
         Movie searchedMovie = movieService.getMovieById(id);
         return MovieResponse.from(searchedMovie);
     }
 
     @PutMapping("/{id}")
-    public MovieResponse update(@RequestBody @NotNull CreateMovieRequest movieRequest, @PathVariable Long id) {
+    public MovieResponse update(@RequestBody @NotNull CreateMovieRequest movieRequest, @PathVariable String id) {
         Movie movie = movieRequest.toMovie();
         movie.setId(id);
         return MovieResponse.from(movieService.updateMovie(movie));
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id){
-    movieService.deleteMovie(id);
+    public void delete(@PathVariable String id) {
+        movieService.deleteMovie(id);
     }
 
     @GetMapping("/watched")

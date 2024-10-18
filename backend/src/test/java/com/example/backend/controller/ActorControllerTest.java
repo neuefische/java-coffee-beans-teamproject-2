@@ -15,6 +15,7 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @SpringBootTest
@@ -23,8 +24,8 @@ class ActorControllerTest {
     private static final String URL_BASE = "/api/actor";
     private static final String URL_AUTOCOMPLETION = "/api/actor/autocompletion/{prefix}";
 
-    private static final long ID_FIRST = 1L;
-    private static final long ID_SECOND = 2L;
+    private static final String ID_FIRST = "1L";
+    private static final String ID_SECOND = "2L";
 
     private static final String NAME_JANE = "Jane Doe";
     private static final String NAME_JIM = "Jim Doe";
@@ -58,8 +59,8 @@ class ActorControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
         List<Actor> actual = actorRepository.findAll();
-        List<Actor> expected = List.of(Actor.builder().id(ID_FIRST).name(NAME_JOHN).build());
-        assertEquals(expected, actual);
+        assertEquals(1, actual.size());
+        assertEquals(NAME_JOHN, actual.getFirst().getName());
     }
 
     @Test
@@ -78,8 +79,9 @@ class ActorControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
         List<Actor> actual = actorRepository.findAll();
-        List<Actor> expected = List.of(Actor.builder().id(ID_FIRST).name(NAME_JANE).build());
-        assertEquals(expected, actual);
+        assertEquals(1, actual.size());
+        assertEquals(NAME_JANE, actual.getFirst().getName());
+        assertNotEquals(ID_SECOND, actual.getFirst().getId());
     }
 
     @Test

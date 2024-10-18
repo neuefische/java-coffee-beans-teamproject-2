@@ -2,6 +2,7 @@ package com.example.backend.controller;
 
 import com.example.backend.dto.ActorResponse;
 import com.example.backend.dto.MovieActorRequest;
+import com.example.backend.model.MovieActorRelation;
 import com.example.backend.service.MovieActorService;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -19,8 +20,8 @@ public class MovieActorController {
     private final MovieActorService movieActorService;
 
     @PostMapping()
-    public void addRelation(@RequestBody @NonNull MovieActorRequest movieActorRequest) {
-        movieActorService.addActor(movieActorRequest.movieId(), movieActorRequest.actorId());
+    public MovieActorRelation addRelation(@RequestBody @NonNull MovieActorRequest movieActorRequest) {
+        return movieActorService.addActor(movieActorRequest.movieId(), movieActorRequest.actorId());
     }
 
     @DeleteMapping()
@@ -29,7 +30,7 @@ public class MovieActorController {
     }
 
     @GetMapping("/{movieId}")
-    public List<ActorResponse> getActorsByMovieId(@PathVariable @NonNull Long movieId) {
+    public List<ActorResponse> getActorsByMovieId(@PathVariable @NonNull String movieId) {
         return movieActorService.getActorsByMovieId(movieId).stream().map(ActorResponse::from).toList();
     }
 
@@ -41,4 +42,5 @@ public class MovieActorController {
     @GetMapping("/")
     public void getByMovieIdInvalid() throws NoResourceFoundException {
         throw new NoResourceFoundException(HttpMethod.GET, "/api/actor-movie/");
-    }}
+    }
+}

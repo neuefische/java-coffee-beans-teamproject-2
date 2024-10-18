@@ -12,7 +12,11 @@ import java.util.List;
 public class ActorService {
     private final ActorRepository actorRepository;
 
+    private final IdService idService;
+
     public Actor createActor(Actor actor) {
+        actor.setId(idService.getRandomId());
+
         return actorRepository.save(actor);
     }
 
