@@ -58,10 +58,10 @@ class MovieActorControllerTest {
         actorRepository.saveAll(List.of(actorJane, actorJim, actorJoe, actorJohn));
         movieActorRelationRepository.saveAll(
                 List.of(
-                        MovieActorRelation.builder().actor(actorJane).movie(movieFirst).build(),
-                        MovieActorRelation.builder().actor(actorJoe).movie(movieSecond).build(),
-                        MovieActorRelation.builder().actor(actorJim).movie(movieSecond).build(),
-                        MovieActorRelation.builder().actor(actorJane).movie(movieSecond).build()
+                        MovieActorRelation.builder().actorId(actorJane.getId()).movieId(movieFirst.getId()).build(),
+                        MovieActorRelation.builder().actorId(actorJoe.getId()).movieId(movieSecond.getId()).build(),
+                        MovieActorRelation.builder().actorId(actorJim.getId()).movieId(movieSecond.getId()).build(),
+                        MovieActorRelation.builder().actorId(actorJane.getId()).movieId(movieSecond.getId()).build()
                 )
         );
 
@@ -88,10 +88,10 @@ class MovieActorControllerTest {
         actorRepository.saveAll(List.of(actorJane, actorJim, actorJoe, actorJohn));
         movieActorRelationRepository.saveAll(
                 List.of(
-                        MovieActorRelation.builder().actor(actorJane).movie(movieFirst).build(),
-                        MovieActorRelation.builder().actor(actorJoe).movie(movieFirst).build(),
-                        MovieActorRelation.builder().actor(actorJim).movie(movieFirst).build(),
-                        MovieActorRelation.builder().actor(actorJohn).movie(movieFirst).build()
+                        MovieActorRelation.builder().actorId(actorJane.getId()).movieId(movieFirst.getId()).build(),
+                        MovieActorRelation.builder().actorId(actorJoe.getId()).movieId(movieFirst.getId()).build(),
+                        MovieActorRelation.builder().actorId(actorJim.getId()).movieId(movieFirst.getId()).build(),
+                        MovieActorRelation.builder().actorId(actorJohn.getId()).movieId(movieFirst.getId()).build()
                 )
         );
 
@@ -129,7 +129,7 @@ class MovieActorControllerTest {
 
         List<MovieActorRelation> actualActorIdList = movieActorRelationRepository.findByMovieId(movie.getId());
         assertEquals(1, actualActorIdList.size());
-        assertEquals(actor.getId(), actualActorIdList.getFirst().getActor().getId());
+        assertEquals(actor.getId(), actualActorIdList.getFirst().getActorId());
     }
 
     @Test
@@ -139,7 +139,7 @@ class MovieActorControllerTest {
         Actor actor = Actor.builder().name(ACTOR_NAME_JANE).build();
         movieRepository.save(movie);
         actorRepository.save(actor);
-        movieActorRelationRepository.save(MovieActorRelation.builder().actor(actor).movie(movie).build());
+        movieActorRelationRepository.save(MovieActorRelation.builder().actorId(actor.getId()).movieId(movie.getId()).build());
 
         mockMvc.perform(MockMvcRequestBuilders.post(URL_BASE)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -151,7 +151,7 @@ class MovieActorControllerTest {
                                          }
                                         """.formatted(actor.getId(), movie.getId())
                         ))
-                .andExpect(MockMvcResultMatchers.status().is5xxServerError());
+                .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     @Test
@@ -161,7 +161,7 @@ class MovieActorControllerTest {
         Actor actor = Actor.builder().name(ACTOR_NAME_JANE).build();
         movieRepository.save(movie);
         actorRepository.save(actor);
-        Long nonExistentActorId = actor.getId() + 1;
+        String nonExistentActorId = actor.getId() + "1";
 
         mockMvc.perform(MockMvcRequestBuilders.post(URL_BASE)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -183,7 +183,7 @@ class MovieActorControllerTest {
         Actor actor = Actor.builder().name(ACTOR_NAME_JANE).build();
         movieRepository.save(movie);
         actorRepository.save(actor);
-        Long nonExistentMovieId = movie.getId() + 1L;
+        String nonExistentMovieId = movie.getId() + "1L";
 
         mockMvc.perform(MockMvcRequestBuilders.post(URL_BASE)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -203,17 +203,17 @@ class MovieActorControllerTest {
     @DirtiesContext
     void removeActor_successful() throws Exception {
         Movie movieFirst = Movie.builder().name(MOVIE_NAME_MEMENTO).build();
-        Movie movieSecond = Movie.builder().name(MOVIE_NAME_MEMENTO).build();
+        Movie movieSecond = Movie.builder().name(MOVIE_NAME_DEADPOOL).build();
         Actor actorJane = Actor.builder().name(ACTOR_NAME_JANE).build();
-        Actor actorJim = Actor.builder().name(ACTOR_NAME_JANE).build();
+        Actor actorJim = Actor.builder().name(ACTOR_NAME_JIM).build();
         movieRepository.save(movieFirst);
         movieRepository.save(movieSecond);
         actorRepository.save(actorJane);
         actorRepository.save(actorJim);
-        movieActorRelationRepository.save(MovieActorRelation.builder().actor(actorJane).movie(movieFirst).build());
-        movieActorRelationRepository.save(MovieActorRelation.builder().actor(actorJim).movie(movieFirst).build());
-        movieActorRelationRepository.save(MovieActorRelation.builder().actor(actorJane).movie(movieSecond).build());
-        movieActorRelationRepository.save(MovieActorRelation.builder().actor(actorJim).movie(movieSecond).build());
+        movieActorRelationRepository.save(MovieActorRelation.builder().actorId(actorJane.getId()).movieId(movieFirst.getId()).build());
+        movieActorRelationRepository.save(MovieActorRelation.builder().actorId(actorJim.getId()).movieId(movieFirst.getId()).build());
+        movieActorRelationRepository.save(MovieActorRelation.builder().actorId(actorJane.getId()).movieId(movieSecond.getId()).build());
+        movieActorRelationRepository.save(MovieActorRelation.builder().actorId(actorJim.getId()).movieId(movieSecond.getId()).build());
 
         mockMvc.perform(MockMvcRequestBuilders.delete(URL_BASE)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -247,9 +247,9 @@ class MovieActorControllerTest {
         movieRepository.save(movieSecond);
         actorRepository.save(actorJane);
         actorRepository.save(actorJim);
-        movieActorRelationRepository.save(MovieActorRelation.builder().actor(actorJim).movie(movieFirst).build());
-        movieActorRelationRepository.save(MovieActorRelation.builder().actor(actorJane).movie(movieSecond).build());
-        movieActorRelationRepository.save(MovieActorRelation.builder().actor(actorJim).movie(movieSecond).build());
+        movieActorRelationRepository.save(MovieActorRelation.builder().actorId(actorJim.getId()).movieId(movieFirst.getId()).build());
+        movieActorRelationRepository.save(MovieActorRelation.builder().actorId(actorJane.getId()).movieId(movieSecond.getId()).build());
+        movieActorRelationRepository.save(MovieActorRelation.builder().actorId(actorJim.getId()).movieId(movieSecond.getId()).build());
 
         mockMvc.perform(MockMvcRequestBuilders.delete(URL_BASE)
                         .contentType(MediaType.APPLICATION_JSON)

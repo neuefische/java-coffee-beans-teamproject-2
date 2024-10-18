@@ -1,28 +1,19 @@
 package com.example.backend.model;
 
-import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.Id;
 
-@Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @With
 @Data
-@Table(
-        uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"director_id", "movie_id"})
-        }
-)
 public class MovieDirectorRelation {
     @Id
-    @GeneratedValue
-    private Long id;
+    private String id;
 
-    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
-    private Director director;
+    private String directorId;
 
-    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
-    private Movie movie;
+    private String movieId;
 }
 
