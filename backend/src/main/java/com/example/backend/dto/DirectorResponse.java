@@ -5,7 +5,7 @@ import com.example.backend.model.Director;
 import lombok.Builder;
 
 @Builder
-public record DirectorResponse(Long id, String name) {
+public record DirectorResponse(String id, String name) {
     public static DirectorResponse from(Director director) {
         return DirectorResponse.builder()
                 .id(director.getId())

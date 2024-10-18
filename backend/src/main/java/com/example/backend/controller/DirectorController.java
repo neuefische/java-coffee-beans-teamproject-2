@@ -30,13 +30,13 @@ public class DirectorController {
     }
 
     @GetMapping("/{id}")
-    public DirectorResponse getDirectorById(@PathVariable @NonNull Long id) {
+    public DirectorResponse getDirectorById(@PathVariable @NonNull String  id) {
         Director searchedMovie = directorService.getDirectorById(id);
         return DirectorResponse.from(searchedMovie);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    public void delete(@PathVariable String  id) {
         directorService.deleteDirector(id);
     }
 }

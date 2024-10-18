@@ -20,11 +20,11 @@ public class DirectorService {
         return directorRepository.findAll();
     }
 
-    public Director getDirectorById(Long directorId) {
+    public Director getDirectorById(String directorId) {
         return directorRepository.findById(directorId).orElseThrow();
     }
 
-    public void deleteDirector(Long directorId) {
+    public void deleteDirector(String directorId) {
         Director director = directorRepository.findById(directorId).orElseThrow();
         directorRepository.delete(director);
     }
