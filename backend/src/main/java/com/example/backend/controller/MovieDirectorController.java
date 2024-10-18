@@ -1,17 +1,13 @@
 package com.example.backend.controller;
 
-import com.example.backend.dto.ActorResponse;
-import com.example.backend.dto.MovieActorRequest;
+
 import com.example.backend.dto.MovieDirectorRequest;
-import com.example.backend.service.MovieActorService;
 import com.example.backend.service.MovieDirectorService;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
-
-import java.util.List;
 
 @RestController
 @AllArgsConstructor
