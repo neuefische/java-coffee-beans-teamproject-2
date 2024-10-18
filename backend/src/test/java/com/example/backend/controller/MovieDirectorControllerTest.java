@@ -51,9 +51,9 @@ class MovieDirectorControllerTest {
         movieRepository.saveAll(List.of(movieFirst, movieSecond));
         directorRepository.saveAll(List.of(directorJane, directorJim));
         movieDirectorRelationRepository.saveAll(List.of(
-                MovieDirectorRelation.builder().director(directorJim).movie(movieFirst).build(),
-                MovieDirectorRelation.builder().director(directorJim).movie(movieSecond).build(),
-                MovieDirectorRelation.builder().director(directorJane).movie(movieSecond).build()
+                MovieDirectorRelation.builder().directorId(directorJim.getId()).movieId(movieFirst.getId()).build(),
+                MovieDirectorRelation.builder().directorId(directorJim.getId()).movieId(movieSecond.getId()).build(),
+                MovieDirectorRelation.builder().directorId(directorJane.getId()).movieId(movieSecond.getId()).build()
         ));
         mockMvc.perform(MockMvcRequestBuilders.post(URL_BASE)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -82,9 +82,9 @@ class MovieDirectorControllerTest {
         movieRepository.saveAll(List.of(movieFirst, movieSecond));
         directorRepository.saveAll(List.of(directorJane, directorJim));
         movieDirectorRelationRepository.saveAll(List.of(
-                MovieDirectorRelation.builder().director(directorJim).movie(movieFirst).build(),
-                MovieDirectorRelation.builder().director(directorJim).movie(movieSecond).build(),
-                MovieDirectorRelation.builder().director(directorJane).movie(movieSecond).build()
+                MovieDirectorRelation.builder().directorId(directorJim.getId()).movieId(movieFirst.getId()).build(),
+                MovieDirectorRelation.builder().directorId(directorJim.getId()).movieId(movieSecond.getId()).build(),
+                MovieDirectorRelation.builder().directorId(directorJane.getId()).movieId(movieSecond.getId()).build()
         ));
         mockMvc.perform(MockMvcRequestBuilders.post(URL_BASE)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -97,7 +97,7 @@ class MovieDirectorControllerTest {
                                         """.formatted(movieFirst.getId(), directorJim.getId())
                         )
                 )
-                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
+                .andExpect(MockMvcResultMatchers.status().isOk());
         Long relationCount = movieDirectorRelationRepository.count();
         assertEquals(relationCount, 3);
     }
@@ -113,9 +113,9 @@ class MovieDirectorControllerTest {
         movieRepository.saveAll(List.of(movieFirst, movieSecond));
         directorRepository.saveAll(List.of(directorJane, directorJim));
         movieDirectorRelationRepository.saveAll(List.of(
-                MovieDirectorRelation.builder().director(directorJim).movie(movieFirst).build(),
-                MovieDirectorRelation.builder().director(directorJim).movie(movieSecond).build(),
-                MovieDirectorRelation.builder().director(directorJane).movie(movieSecond).build()
+                MovieDirectorRelation.builder().directorId(directorJim.getId()).movieId(movieFirst.getId()).build(),
+                MovieDirectorRelation.builder().directorId(directorJim.getId()).movieId(movieSecond.getId()).build(),
+                MovieDirectorRelation.builder().directorId(directorJane.getId()).movieId(movieSecond.getId()).build()
         ));
         assertEquals(movieDirectorRelationRepository.count(), 3);
         mockMvc.perform(MockMvcRequestBuilders.delete(URL_BASE)
@@ -144,9 +144,9 @@ class MovieDirectorControllerTest {
         movieRepository.saveAll(List.of(movieFirst, movieSecond));
         directorRepository.saveAll(List.of(directorJane, directorJim));
         movieDirectorRelationRepository.saveAll(List.of(
-                MovieDirectorRelation.builder().director(directorJim).movie(movieFirst).build(),
-                MovieDirectorRelation.builder().director(directorJim).movie(movieSecond).build(),
-                MovieDirectorRelation.builder().director(directorJane).movie(movieSecond).build()
+                MovieDirectorRelation.builder().directorId(directorJim.getId()).movieId(movieFirst.getId()).build(),
+                MovieDirectorRelation.builder().directorId(directorJim.getId()).movieId(movieSecond.getId()).build(),
+                MovieDirectorRelation.builder().directorId(directorJane.getId()).movieId(movieSecond.getId()).build()
         ));
         assertEquals(movieDirectorRelationRepository.count(), 3);
         mockMvc.perform(MockMvcRequestBuilders.delete(URL_BASE)

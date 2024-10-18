@@ -4,25 +4,32 @@ import com.example.backend.model.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class MovieDirectorService {
+    private final IdService idService;
 
     private final DirectorRepository directorRepository;
 
     private final MovieRepository movieRepository;
     private final MovieDirectorRelationRepository movieDirectorRelationRepository;
 
-
-    public void addRelation(Long movieId, Long directorId) {
-        Movie movie = movieRepository.findById(movieId).orElseThrow();
-        Director director = directorRepository.findById(directorId).orElseThrow();
-        movieDirectorRelationRepository.save(MovieDirectorRelation.builder().director(director).movie(movie).build());
+    public MovieDirectorRelation addRelation(String movieId, String directorId) {
+        return movieDirectorRelationRepository
+                .findByMovieIdAndDirectorId(movieId, directorId).orElseGet(
+                        () -> {
+                            Movie movie = movieRepository.findById(movieId).orElseThrow();
+                            Director director = directorRepository.findById(directorId).orElseThrow();
+                            return movieDirectorRelationRepository.save(MovieDirectorRelation.builder()
+                                    .id(idService.getRandomId())
+                                    .movieId(movie.getId())
+                                    .directorId(director.getId())
+                                    .build());
+                        }
+                );
     }
 
-    public void removeRelation(Long movieId, Long directorId) {
+    public void removeRelation(String movieId, String directorId) {
         MovieDirectorRelation relation = movieDirectorRelationRepository
                 .findByMovieIdAndDirectorId(movieId, directorId)
                 .orElseThrow();
