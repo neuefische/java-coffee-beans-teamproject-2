@@ -151,7 +151,7 @@ class MovieActorControllerTest {
                                          }
                                         """.formatted(actor.getId(), movie.getId())
                         ))
-                .andExpect(MockMvcResultMatchers.status().is5xxServerError());
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
     }
 
     @Test
