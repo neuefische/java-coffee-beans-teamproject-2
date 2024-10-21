@@ -25,7 +25,6 @@ public class DirectorService {
     }
 
     public void deleteDirector(String directorId) {
-        Director director = directorRepository.findById(directorId).orElseThrow();
-        directorRepository.delete(director);
+        directorRepository.findById(directorId).ifPresent(directorRepository::delete);
     }
 }

@@ -160,7 +160,7 @@ class DirectorControllerTest {
                 )
         );
         mockMvc.perform(MockMvcRequestBuilders.delete(URL_BASE + "/" + 3))
-                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
+                .andExpect(MockMvcResultMatchers.status().isOk());
         mockMvc.perform(MockMvcRequestBuilders.get(URL_BASE))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))

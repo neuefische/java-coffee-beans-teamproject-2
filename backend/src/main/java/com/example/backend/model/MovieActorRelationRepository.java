@@ -12,4 +12,6 @@ public interface MovieActorRelationRepository extends MongoRepository<MovieActor
     List<MovieActorRelation> findByMovieId(String movieId);
 
     Optional<MovieActorRelation> findByMovieIdAndActorId(String movieId, String actorId);
+
+    void deleteByMovieId(String movieId);
 }

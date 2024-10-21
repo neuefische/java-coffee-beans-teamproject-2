@@ -32,6 +32,11 @@ public class MovieDirectorController {
         movieDirectorService.removeRelation(movieDirectorRequest.movieId(), movieDirectorRequest.directorId());
     }
 
+    @DeleteMapping("/{movieId}")
+    public void deleteRelationsByMovieId(@PathVariable @NonNull String movieId) {
+        movieDirectorService.removeRelationsByMovieId(movieId);
+    }
+
     @GetMapping("/{movieId}")
     public List<DirectorResponse> getDirectorsByMovieId(@PathVariable @NonNull String movieId) {
         return movieDirectorService.getDirectorsByMovieId(movieId).stream().map(DirectorResponse::from).toList();
