@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +22,9 @@ public class MovieActorService {
         return movieActorRelationRepository.findByMovieId(movieId)
                 .stream()
                 .map(MovieActorRelation::getActorId)
-                .map(id -> actorRepository.findById(id).orElseThrow())
+                .map(actorRepository::findById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .toList();
     }
 

@@ -4,6 +4,9 @@ import com.example.backend.model.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class MovieDirectorService {
@@ -13,6 +16,16 @@ public class MovieDirectorService {
 
     private final MovieRepository movieRepository;
     private final MovieDirectorRelationRepository movieDirectorRelationRepository;
+
+    public List<Director> getDirectorsByMovieId(String movieId) {
+        return movieDirectorRelationRepository.findByMovieId(movieId)
+                .stream()
+                .map(MovieDirectorRelation::getDirectorId)
+                .map(directorRepository::findById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
+    }
 
     public MovieDirectorRelation addRelation(String movieId, String directorId) {
         return movieDirectorRelationRepository
