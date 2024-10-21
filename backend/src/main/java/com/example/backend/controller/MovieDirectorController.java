@@ -33,7 +33,7 @@ public class MovieDirectorController {
     }
 
     @GetMapping("/{movieId}")
-    public List<DirectorResponse> getActorsByMovieId(@PathVariable @NonNull String movieId) {
+    public List<DirectorResponse> getDirectorsByMovieId(@PathVariable @NonNull String movieId) {
         return movieDirectorService.getDirectorsByMovieId(movieId).stream().map(DirectorResponse::from).toList();
     }
 
