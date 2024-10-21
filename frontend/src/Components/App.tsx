@@ -4,6 +4,7 @@ import Details from "./App/Details.tsx";
 import Header from "./App/Header.tsx";
 import Footer from "./App/Footer.tsx";
 
+
 function App() {
 
     return (
