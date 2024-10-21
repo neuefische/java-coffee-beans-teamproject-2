@@ -15,7 +15,7 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @SpringBootTest
@@ -215,5 +215,25 @@ class MovieDirectorControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get(URL_WITH_ID, movieSecond.getId()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(jsonPath("$", hasSize(0)));
+    }
+
+    @Test
+    @DirtiesContext
+    void deleteRelationsByMovieId() throws Exception {
+        Movie movieFirst = Movie.builder().name(MOVIE_NAME_MEMENTO).build();
+        Movie movieSecond = Movie.builder().name(MOVIE_NAME_DEADPOOL).build();
+        Director directorJane = Director.builder().name(DIRECTOR_NAME_JANE).build();
+        Director directorJim = Director.builder().name(DIRECTOR_NAME_JIM).build();
+
+        movieRepository.saveAll(List.of(movieFirst, movieSecond));
+        directorRepository.saveAll(List.of(directorJane, directorJim));
+        movieDirectorRelationRepository.saveAll(List.of(
+                MovieDirectorRelation.builder().directorId(directorJim.getId()).movieId(movieFirst.getId()).build(),
+                MovieDirectorRelation.builder().directorId(directorJim.getId()).movieId(movieSecond.getId()).build(),
+                MovieDirectorRelation.builder().directorId(directorJane.getId()).movieId(movieSecond.getId()).build()
+        ));
+        mockMvc.perform(MockMvcRequestBuilders.delete(URL_WITH_ID, movieSecond.getId()))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+        assertEquals(movieDirectorRelationRepository.count(), 1);
     }
 }

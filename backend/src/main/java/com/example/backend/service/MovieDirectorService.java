@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,13 +17,12 @@ public class MovieDirectorService {
     private final MovieDirectorRelationRepository movieDirectorRelationRepository;
 
     public List<Director> getDirectorsByMovieId(String movieId) {
-        return movieDirectorRelationRepository.findByMovieId(movieId)
+        List<String> directorIds = movieDirectorRelationRepository.findByMovieId(movieId)
                 .stream()
                 .map(MovieDirectorRelation::getDirectorId)
-                .map(directorRepository::findById)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
                 .toList();
+
+        return directorRepository.findAllById(directorIds);
     }
 
     public MovieDirectorRelation addRelation(String movieId, String directorId) {
@@ -48,5 +46,9 @@ public class MovieDirectorService {
                 .orElseThrow();
 
         movieDirectorRelationRepository.delete(relation);
+    }
+
+    public void removeRelationsByMovieId(String movieId) {
+        movieDirectorRelationRepository.deleteByMovieId(movieId);
     }
 }
