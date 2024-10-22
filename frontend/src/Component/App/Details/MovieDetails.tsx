@@ -49,7 +49,7 @@ export default function MovieDetails() {
                 <input type="text" name="is-watched" value={String(movieData?.isWatched)} disabled/>
                 <label htmlFor="rating">Rating</label>
                 <input type="text" name="rating" value={movieData?.rating} disabled/>
-                {directorsData && <PersonList people={directorsData} legend={"Directed by"}/>}
+                {directorsData && <PersoncdList people={directorsData} legend={"Directed by"}/>}
                 {actorsData && <PersonList people={actorsData} legend={"Starring"}/>}
             </form>
         </div>
