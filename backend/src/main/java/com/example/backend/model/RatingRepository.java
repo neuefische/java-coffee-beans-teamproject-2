@@ -13,4 +13,6 @@ public interface RatingRepository extends MongoRepository<Rating, String> {
     List<Rating> findAllByUserIdAndIsWatchedIsFalse(String userId);
 
     List<Rating> findAllByUserIdAndIsWatchedIsTrue(String userId);
+
+    List<Rating> findAllByMovieIdAndUserId(List<String> movieId, String userId);
 }

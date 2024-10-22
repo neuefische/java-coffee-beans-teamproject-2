@@ -16,14 +16,17 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.util.List;
 import java.util.Optional;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 class RatingControllerTest {
     private static final String URL_BASE = "/api/rating";
+    private static final String URL_WITH_ID = "/api/rating/{id}";
 
     private static final String MOVIE_ID_FIRST = "1";
     private static final String MOVIE_ID_SECOND = "2";
@@ -122,6 +125,49 @@ class RatingControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized());
     }
 
+    @Test
+    @DirtiesContext
+    void getTest_successful() throws Exception {
+        ratingRepository.saveAll(
+                List.of(
+                        Rating.builder().movieId(MOVIE_ID_FIRST).userId(USER_FIRST).isWatched(WATCHED_FIRST).rating(RATING_FIRST).build(),
+                        Rating.builder().movieId(MOVIE_ID_FIRST).userId(USER_SECOND).isWatched(WATCHED_SECOND).rating(RATING_SECOND).build(),
+                        Rating.builder().movieId(MOVIE_ID_SECOND).userId(USER_FIRST).isWatched(WATCHED_SECOND).rating(RATING_SECOND).build(),
+                        Rating.builder().movieId(MOVIE_ID_SECOND).userId(USER_SECOND).isWatched(WATCHED_SECOND).rating(RATING_SECOND).build()
+                )
+        );
+
+        mockMvc.perform(MockMvcRequestBuilders.get(URL_WITH_ID, MOVIE_ID_FIRST)
+                        .with(mockUser()))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.movieId").value(MOVIE_ID_FIRST))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.isWatched").value(WATCHED_FIRST))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.rating").value(RATING_FIRST))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.userId").value(USER_FIRST));
+    }
+
+    @Test
+    @DirtiesContext
+    void getTest_failed() throws Exception {
+        ratingRepository.saveAll(
+                List.of(
+                        Rating.builder().movieId(MOVIE_ID_FIRST).userId(USER_SECOND).isWatched(WATCHED_SECOND).rating(RATING_SECOND).build(),
+                        Rating.builder().movieId(MOVIE_ID_SECOND).userId(USER_FIRST).isWatched(WATCHED_SECOND).rating(RATING_SECOND).build(),
+                        Rating.builder().movieId(MOVIE_ID_SECOND).userId(USER_SECOND).isWatched(WATCHED_SECOND).rating(RATING_SECOND).build()
+                )
+        );
+
+        mockMvc.perform(MockMvcRequestBuilders.get(URL_WITH_ID, MOVIE_ID_FIRST)
+                .with(mockUser()))
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
+    }
+
+    @Test
+    void getTest_unauthorized() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get(URL_WITH_ID, MOVIE_ID_FIRST))
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized());
+    }
 
     private OidcLoginRequestPostProcessor mockUser() {
         return oidcLogin().userInfoToken(token -> token

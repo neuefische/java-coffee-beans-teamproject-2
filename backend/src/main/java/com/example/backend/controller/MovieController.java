@@ -1,13 +1,14 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.CreateMovieRequest;
+import com.example.backend.dto.MovieRatingResponse;
 import com.example.backend.dto.MovieResponse;
 import com.example.backend.model.Movie;
+import com.example.backend.model.RatingRepository;
 import com.example.backend.service.MovieService;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/movie")
 public class MovieController {
     private final MovieService movieService;
+    private final RatingRepository ratingRepository;
 
     @PostMapping
     public MovieResponse save(@RequestBody @NotNull CreateMovieRequest movieRequest) {
@@ -51,14 +53,16 @@ public class MovieController {
     }
 
     @GetMapping("/watched")
-    public List<MovieResponse> getWatchedMovies(@AuthenticationPrincipal OAuth2User user) {
+    public List<MovieRatingResponse> getWatchedMovies(@AuthenticationPrincipal OAuth2User user) {
         return movieService.getWatchedMovies(user.getAttributes().get("login").toString()).stream()
-                .map(MovieResponse::from).collect(Collectors.toList());
+                .map(ratingMoviePair -> MovieRatingResponse.from(ratingMoviePair.getSecond(), ratingMoviePair.getFirst()))
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/wishlist")
-    public List<MovieResponse> getWishlistedMovies(@AuthenticationPrincipal OAuth2User user) {
+    public List<MovieRatingResponse> getWishlistedMovies(@AuthenticationPrincipal OAuth2User user) {
         return movieService.getWishlistedMovies(user.getAttributes().get("login").toString()).stream()
-                .map(MovieResponse::from).collect(Collectors.toList());
+                .map(ratingMoviePair -> MovieRatingResponse.from(ratingMoviePair.getSecond(), ratingMoviePair.getFirst()))
+                .collect(Collectors.toList());
     }
 }

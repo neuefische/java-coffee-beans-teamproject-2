@@ -18,4 +18,8 @@ public class RatingService {
                         () -> ratingRepository.save(rating)
                 );
     }
+
+    public Rating get(String userId, String movieId) {
+        return ratingRepository.findFirstByUserIdAndMovieId(userId, movieId).orElseThrow();
+    }
 }

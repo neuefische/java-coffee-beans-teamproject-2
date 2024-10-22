@@ -333,8 +333,12 @@ class MovieControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].name").value(NAME_FIRST))
-                .andExpect(jsonPath("$[1].name").value(NAME_SECOND));
+                .andExpect(jsonPath("$[0].movieName").value(NAME_FIRST))
+                .andExpect(jsonPath("$[1].movieName").value(NAME_SECOND))
+                .andExpect(jsonPath("$[0].isWatched").value(true))
+                .andExpect(jsonPath("$[1].isWatched").value(true))
+                .andExpect(jsonPath("$[0].rating").value(RATING_ONE))
+                .andExpect(jsonPath("$[1].rating").value(RATING_TWO));
     }
 
     @Test
@@ -404,8 +408,12 @@ class MovieControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].name").value(NAME_FIRST))
-                .andExpect(jsonPath("$[1].name").value(NAME_SECOND));
+                .andExpect(jsonPath("$[0].movieName").value(NAME_FIRST))
+                .andExpect(jsonPath("$[1].movieName").value(NAME_SECOND))
+                .andExpect(jsonPath("$[0].isWatched").value(false))
+                .andExpect(jsonPath("$[1].isWatched").value(false))
+                .andExpect(jsonPath("$[0].rating").value(RATING_ONE))
+                .andExpect(jsonPath("$[1].rating").value(RATING_TWO));
     }
 
     @Test
