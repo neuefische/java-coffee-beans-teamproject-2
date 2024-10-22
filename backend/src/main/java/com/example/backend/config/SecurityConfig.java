@@ -30,7 +30,7 @@ public class SecurityConfig {
                 .exceptionHandling(e -> e
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .oauth2Login(o -> o.defaultSuccessUrl(appUrl))
-                .logout(l -> l.logoutUrl("/api/auth/logout"));
+                .logout(l -> l.logoutUrl("/api/auth/logout").logoutSuccessUrl(appUrl));
         return http.build();
     }
 }
