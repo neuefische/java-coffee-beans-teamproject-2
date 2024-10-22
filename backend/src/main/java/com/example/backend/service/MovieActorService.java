@@ -18,11 +18,12 @@ public class MovieActorService {
     private final MovieRepository movieRepository;
 
     public List<Actor> getActorsByMovieId(String movieId) {
-        return movieActorRelationRepository.findByMovieId(movieId)
+        List<String> actorIds = movieActorRelationRepository.findByMovieId(movieId)
                 .stream()
                 .map(MovieActorRelation::getActorId)
-                .map(id -> actorRepository.findById(id).orElseThrow())
                 .toList();
+
+        return actorRepository.findAllById(actorIds);
     }
 
     public MovieActorRelation addActor(String movieId, String actorId) {
@@ -46,5 +47,9 @@ public class MovieActorService {
                 .orElseThrow();
 
         movieActorRelationRepository.delete(relation);
+    }
+
+    public void removeRelationsByMovieId(String movieId) {
+        movieActorRelationRepository.deleteByMovieId(movieId);
     }
 }

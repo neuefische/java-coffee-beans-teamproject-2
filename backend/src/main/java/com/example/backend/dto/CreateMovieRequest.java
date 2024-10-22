@@ -14,6 +14,6 @@ public record CreateMovieRequest(
 
 ) {
     public Movie toMovie() {
-        return Movie.builder().name(name).isWatched(isWatched).rating(isWatched ? rating : null).build();
+        return Movie.builder().name(name).isWatched(isWatched).rating(rating).build();
     }
 }

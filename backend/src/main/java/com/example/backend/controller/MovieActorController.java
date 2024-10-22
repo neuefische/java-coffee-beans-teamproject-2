@@ -32,6 +32,11 @@ public class MovieActorController {
         movieActorService.removeActor(movieActorRequest.movieId(), movieActorRequest.actorId());
     }
 
+    @DeleteMapping("/{movieId}")
+    public void deleteRelationsByMovieId(@PathVariable @NonNull String movieId) {
+        movieActorService.removeRelationsByMovieId(movieId);
+    }
+
     @GetMapping("/{movieId}")
     public List<ActorResponse> getActorsByMovieId(@PathVariable @NonNull String movieId) {
         return movieActorService.getActorsByMovieId(movieId).stream().map(ActorResponse::from).toList();
@@ -44,6 +49,6 @@ public class MovieActorController {
      */
     @GetMapping("/")
     public void getByMovieIdInvalid() throws NoResourceFoundException {
-        throw new NoResourceFoundException(HttpMethod.GET, "/api/actor-movie/");
+        throw new NoResourceFoundException(HttpMethod.GET, "/api/movie-actor/");
     }
 }

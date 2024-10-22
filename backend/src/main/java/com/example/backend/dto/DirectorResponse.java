@@ -1,6 +1,5 @@
 package com.example.backend.dto;
 
-import com.example.backend.model.Actor;
 import com.example.backend.model.Director;
 import lombok.Builder;
 

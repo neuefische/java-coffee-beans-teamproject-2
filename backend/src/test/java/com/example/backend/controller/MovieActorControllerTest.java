@@ -266,4 +266,30 @@ class MovieActorControllerTest {
                         ))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError());
     }
+
+    @Test
+    @DirtiesContext
+    void deleteRelationsByMovieId() throws Exception {
+        Movie movieFirst = Movie.builder().name(MOVIE_NAME_MEMENTO).build();
+        Movie movieSecond = Movie.builder().name(MOVIE_NAME_DEADPOOL).build();
+        Actor actorJane = Actor.builder().name(ACTOR_NAME_JANE).build();
+        Actor actorJim = Actor.builder().name(ACTOR_NAME_JIM).build();
+        movieRepository.save(movieFirst);
+        movieRepository.save(movieSecond);
+        actorRepository.save(actorJane);
+        actorRepository.save(actorJim);
+        movieActorRelationRepository.save(MovieActorRelation.builder().actorId(actorJane.getId()).movieId(movieFirst.getId()).build());
+        movieActorRelationRepository.save(MovieActorRelation.builder().actorId(actorJim.getId()).movieId(movieFirst.getId()).build());
+        movieActorRelationRepository.save(MovieActorRelation.builder().actorId(actorJane.getId()).movieId(movieSecond.getId()).build());
+        movieActorRelationRepository.save(MovieActorRelation.builder().actorId(actorJim.getId()).movieId(movieSecond.getId()).build());
+
+        mockMvc.perform(MockMvcRequestBuilders.delete(URL_WITH_ID, movieFirst.getId())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        assertEquals(
+                2,
+                movieActorRelationRepository.findAll().size()
+        );
+    }
 }

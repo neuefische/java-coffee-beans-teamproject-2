@@ -12,6 +12,10 @@ import java.util.List;
 public class MovieService {
     private final MovieRepository movieRepository;
 
+    private final MovieActorService movieActorService;
+
+    private final MovieDirectorService movieDirectorService;
+
     private final IdService idService;
 
     public Movie createMovie(Movie movie) {
@@ -37,8 +41,7 @@ public class MovieService {
     }
 
     public void deleteMovie(String movieId) {
-        Movie movie = movieRepository.findById(movieId).orElseThrow();
-        movieRepository.delete(movie);
+        movieRepository.findById(movieId).ifPresent(movieRepository::delete);
     }
 
     public Movie updateMovie(Movie movie) {
