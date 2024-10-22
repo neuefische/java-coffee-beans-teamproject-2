@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -16,6 +17,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @SpringBootTest
@@ -30,6 +32,11 @@ class MovieDirectorControllerTest {
 
     private static final String MOVIE_NAME_MEMENTO = "Memento";
     private static final String MOVIE_NAME_DEADPOOL = "Deadpool";
+
+    private SecurityMockMvcRequestPostProcessors.OidcLoginRequestPostProcessor mockUser() {
+        return oidcLogin().userInfoToken(token -> token
+                .claim("login", DIRECTOR_NAME_JOE));
+    }
 
     @Autowired
     private MockMvc mockMvc;
@@ -68,10 +75,38 @@ class MovieDirectorControllerTest {
                                          }
                                         """.formatted(movieFirst.getId(), directorJane.getId())
                         )
-                )
+                        .with(mockUser()))
                 .andExpect(MockMvcResultMatchers.status().isOk());
         Long relationCount = movieDirectorRelationRepository.count();
         assertEquals(relationCount, 4);
+    }
+
+    @Test
+    @DirtiesContext
+    void addRelation_Unauthorized() throws Exception {
+        Movie movieFirst = Movie.builder().name(MOVIE_NAME_MEMENTO).build();
+        Movie movieSecond = Movie.builder().name(MOVIE_NAME_DEADPOOL).build();
+        Director directorJane = Director.builder().name(DIRECTOR_NAME_JANE).build();
+        Director directorJim = Director.builder().name(DIRECTOR_NAME_JIM).build();
+
+        movieRepository.saveAll(List.of(movieFirst, movieSecond));
+        directorRepository.saveAll(List.of(directorJane, directorJim));
+        movieDirectorRelationRepository.saveAll(List.of(
+                MovieDirectorRelation.builder().directorId(directorJim.getId()).movieId(movieFirst.getId()).build(),
+                MovieDirectorRelation.builder().directorId(directorJim.getId()).movieId(movieSecond.getId()).build(),
+                MovieDirectorRelation.builder().directorId(directorJane.getId()).movieId(movieSecond.getId()).build()
+        ));
+        mockMvc.perform(MockMvcRequestBuilders.post(URL_BASE)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(
+                                """
+                                         {
+                                              "movieId": "%s",
+                                              "directorId": "%s"
+                                         }
+                                        """.formatted(movieFirst.getId(), directorJane.getId())
+                        ))
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized());
     }
 
     @Test
@@ -99,7 +134,7 @@ class MovieDirectorControllerTest {
                                          }
                                         """.formatted(movieFirst.getId(), directorJim.getId())
                         )
-                )
+                        .with(mockUser()))
                 .andExpect(MockMvcResultMatchers.status().isOk());
         Long relationCount = movieDirectorRelationRepository.count();
         assertEquals(relationCount, 3);
@@ -131,9 +166,38 @@ class MovieDirectorControllerTest {
                                          }
                                         """.formatted(movieFirst.getId(), directorJim.getId())
                         )
-                )
+                        .with(mockUser()))
                 .andExpect(MockMvcResultMatchers.status().isOk());
         assertEquals(movieDirectorRelationRepository.count(), 2);
+    }
+
+    @Test
+    @DirtiesContext
+    void deleteRelation_Unauthorized() throws Exception {
+        Movie movieFirst = Movie.builder().name(MOVIE_NAME_MEMENTO).build();
+        Movie movieSecond = Movie.builder().name(MOVIE_NAME_DEADPOOL).build();
+        Director directorJane = Director.builder().name(DIRECTOR_NAME_JANE).build();
+        Director directorJim = Director.builder().name(DIRECTOR_NAME_JIM).build();
+
+        movieRepository.saveAll(List.of(movieFirst, movieSecond));
+        directorRepository.saveAll(List.of(directorJane, directorJim));
+        movieDirectorRelationRepository.saveAll(List.of(
+                MovieDirectorRelation.builder().directorId(directorJim.getId()).movieId(movieFirst.getId()).build(),
+                MovieDirectorRelation.builder().directorId(directorJim.getId()).movieId(movieSecond.getId()).build(),
+                MovieDirectorRelation.builder().directorId(directorJane.getId()).movieId(movieSecond.getId()).build()
+        ));
+        assertEquals(movieDirectorRelationRepository.count(), 3);
+        mockMvc.perform(MockMvcRequestBuilders.delete(URL_BASE)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(
+                                """
+                                         {
+                                              "movieId": "%s",
+                                              "directorId": "%s"
+                                         }
+                                        """.formatted(movieFirst.getId(), directorJim.getId())
+                        ))
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized());
     }
 
     @Test
@@ -162,7 +226,7 @@ class MovieDirectorControllerTest {
                                          }
                                         """.formatted(movieFirst.getId(), directorJane.getId())
                         )
-                )
+                        .with(mockUser()))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError());
         assertEquals(movieDirectorRelationRepository.count(), 3);
     }
@@ -185,13 +249,36 @@ class MovieDirectorControllerTest {
                 )
         );
 
-        mockMvc.perform(MockMvcRequestBuilders.get(URL_WITH_ID, movieSecond.getId()))
+        mockMvc.perform(MockMvcRequestBuilders.get(URL_WITH_ID, movieSecond.getId())
+                        .with(mockUser()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[*].name", containsInAnyOrder(
                         directorJim.getName(),
                         directorJoe.getName()
                 )));
+    }
+
+    @Test
+    @DirtiesContext
+    void getDirectorsByMovieIdTest_multipleMatch_Unauthorized() throws Exception {
+        Movie movieFirst = Movie.builder().name(MOVIE_NAME_MEMENTO).build();
+        Movie movieSecond = Movie.builder().name(MOVIE_NAME_DEADPOOL).build();
+        Director directorJane = Director.builder().name(DIRECTOR_NAME_JANE).build();
+        Director directorJim = Director.builder().name(DIRECTOR_NAME_JIM).build();
+        Director directorJoe = Director.builder().name(DIRECTOR_NAME_JOE).build();
+        movieRepository.saveAll(List.of(movieFirst, movieSecond));
+        directorRepository.saveAll(List.of(directorJane, directorJim, directorJoe));
+        movieDirectorRelationRepository.saveAll(
+                List.of(
+                        MovieDirectorRelation.builder().directorId(directorJane.getId()).movieId(movieFirst.getId()).build(),
+                        MovieDirectorRelation.builder().directorId(directorJim.getId()).movieId(movieSecond.getId()).build(),
+                        MovieDirectorRelation.builder().directorId(directorJoe.getId()).movieId(movieSecond.getId()).build()
+                )
+        );
+
+        mockMvc.perform(MockMvcRequestBuilders.get(URL_WITH_ID, movieSecond.getId()))
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized());
     }
 
     @Test
@@ -212,7 +299,8 @@ class MovieDirectorControllerTest {
                 )
         );
 
-        mockMvc.perform(MockMvcRequestBuilders.get(URL_WITH_ID, movieSecond.getId()))
+        mockMvc.perform(MockMvcRequestBuilders.get(URL_WITH_ID, movieSecond.getId())
+                        .with(mockUser()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(jsonPath("$", hasSize(0)));
     }
@@ -232,8 +320,28 @@ class MovieDirectorControllerTest {
                 MovieDirectorRelation.builder().directorId(directorJim.getId()).movieId(movieSecond.getId()).build(),
                 MovieDirectorRelation.builder().directorId(directorJane.getId()).movieId(movieSecond.getId()).build()
         ));
-        mockMvc.perform(MockMvcRequestBuilders.delete(URL_WITH_ID, movieSecond.getId()))
+        mockMvc.perform(MockMvcRequestBuilders.delete(URL_WITH_ID, movieSecond.getId())
+                        .with(mockUser()))
                 .andExpect(MockMvcResultMatchers.status().isOk());
         assertEquals(movieDirectorRelationRepository.count(), 1);
+    }
+
+    @Test
+    @DirtiesContext
+    void deleteRelationsByMovieId_Unauthorized() throws Exception {
+        Movie movieFirst = Movie.builder().name(MOVIE_NAME_MEMENTO).build();
+        Movie movieSecond = Movie.builder().name(MOVIE_NAME_DEADPOOL).build();
+        Director directorJane = Director.builder().name(DIRECTOR_NAME_JANE).build();
+        Director directorJim = Director.builder().name(DIRECTOR_NAME_JIM).build();
+
+        movieRepository.saveAll(List.of(movieFirst, movieSecond));
+        directorRepository.saveAll(List.of(directorJane, directorJim));
+        movieDirectorRelationRepository.saveAll(List.of(
+                MovieDirectorRelation.builder().directorId(directorJim.getId()).movieId(movieFirst.getId()).build(),
+                MovieDirectorRelation.builder().directorId(directorJim.getId()).movieId(movieSecond.getId()).build(),
+                MovieDirectorRelation.builder().directorId(directorJane.getId()).movieId(movieSecond.getId()).build()
+        ));
+        mockMvc.perform(MockMvcRequestBuilders.delete(URL_WITH_ID, movieSecond.getId()))
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized());
     }
 }

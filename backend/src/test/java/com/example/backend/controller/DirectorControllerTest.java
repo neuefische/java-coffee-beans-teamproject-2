@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -16,6 +17,7 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @SpringBootTest
@@ -25,6 +27,11 @@ class DirectorControllerTest {
     private static final long ID_FIRST = 1L;
     private static final String DIRECTOR_ONE = "Guy Ritchie";
     private static final String DIRECTOR_TWO = "Quentin Tarantino";
+
+    private SecurityMockMvcRequestPostProcessors.OidcLoginRequestPostProcessor mockUser() {
+        return oidcLogin().userInfoToken(token -> token
+                .claim("login", DIRECTOR_ONE));
+    }
 
     @Autowired
     private MockMvc mockMvc;
@@ -36,15 +43,15 @@ class DirectorControllerTest {
     @DirtiesContext
     void save() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post(URL_BASE)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(
-                                """
-                                        {
-                                            "name": "%s"
-                                        }
-                                        """.formatted(DIRECTOR_ONE)
-                        ))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                        """
+                                {
+                                    "name": "%s"
+                                }
+                                """.formatted(DIRECTOR_ONE)
+                )
+                .with(mockUser())).andExpect(MockMvcResultMatchers.status().isOk());
         List<Director> actualDirector = directorRepository.findAll();
 
         assertEquals(1, actualDirector.size());
@@ -53,17 +60,31 @@ class DirectorControllerTest {
 
     @Test
     @DirtiesContext
+    void save_Unauthorized() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post(URL_BASE)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                        """
+                                {
+                                    "name": "%s"
+                                }
+                                """.formatted(DIRECTOR_ONE)
+                )).andExpect(MockMvcResultMatchers.status().isUnauthorized());
+    }
+
+    @Test
+    @DirtiesContext
     void save_NoName_Provided() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post(URL_BASE)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                        """
+                                {
+                                    "name": ""
+                                }
                                 """
-                                        {
-                                            "name": ""
-                                        }
-                                        """
-                        ))
-                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
+                )
+                .with(mockUser())).andExpect(MockMvcResultMatchers.status().is4xxClientError());
     }
 
     @Test
@@ -75,8 +96,8 @@ class DirectorControllerTest {
                         Director.builder().name(DIRECTOR_TWO).build()
                 )
         );
-        mockMvc.perform(MockMvcRequestBuilders.get(URL_BASE))
-                .andExpect(MockMvcResultMatchers.status().isOk())
+        mockMvc.perform(MockMvcRequestBuilders.get(URL_BASE)
+                        .with(mockUser())).andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].name").value(DIRECTOR_ONE))
@@ -86,10 +107,24 @@ class DirectorControllerTest {
 
     @Test
     @DirtiesContext
+    void getAll_Unauthorized() throws Exception {
+        directorRepository.saveAll(
+                List.of(
+                        Director.builder().name(DIRECTOR_ONE).build(),
+                        Director.builder().name(DIRECTOR_TWO).build()
+                )
+        );
+        mockMvc.perform(MockMvcRequestBuilders.get(URL_BASE))
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized());
+
+    }
+
+    @Test
+    @DirtiesContext
     void getAll_Empty() throws Exception {
 
-        mockMvc.perform(MockMvcRequestBuilders.get(URL_BASE))
-                .andExpect(MockMvcResultMatchers.status().isOk())
+        mockMvc.perform(MockMvcRequestBuilders.get(URL_BASE)
+                        .with(mockUser())).andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(0)));
     }
@@ -105,11 +140,28 @@ class DirectorControllerTest {
                         firstDirector, secondDirector
                 )
         );
-        mockMvc.perform(MockMvcRequestBuilders.get(URL_BASE + "/" + firstDirector.getId()))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(MockMvcRequestBuilders.get(URL_BASE + "/" + firstDirector.getId())
+                        .with(mockUser())).andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect((MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON)))
                 .andExpect(jsonPath("$.name").value(DIRECTOR_ONE))
                 .andExpect(jsonPath("$.id").value(firstDirector.getId()));
+
+    }
+
+    @Test
+    @DirtiesContext
+    void getDirectorById_Unauthorized() throws Exception {
+        Director firstDirector = Director.builder().name(DIRECTOR_ONE).build();
+        Director secondDirector = Director.builder().name(DIRECTOR_TWO).build();
+
+        directorRepository.saveAll(
+                List.of(
+                        firstDirector, secondDirector
+                )
+        );
+        mockMvc.perform(MockMvcRequestBuilders.get(URL_BASE + "/" + firstDirector.getId())
+                )
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized());
 
     }
 
@@ -122,8 +174,8 @@ class DirectorControllerTest {
                         Director.builder().name(DIRECTOR_TWO).build()
                 )
         );
-        mockMvc.perform(MockMvcRequestBuilders.get(URL_BASE + "/" + 3))
-                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
+        mockMvc.perform(MockMvcRequestBuilders.get(URL_BASE + "/" + 3)
+                .with(mockUser())).andExpect(MockMvcResultMatchers.status().is4xxClientError());
 
     }
 
@@ -140,15 +192,33 @@ class DirectorControllerTest {
                 )
         );
 
-        mockMvc.perform(MockMvcRequestBuilders.delete(URL_BASE + "/" + firstDirector.getId()))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-        mockMvc.perform(MockMvcRequestBuilders.get(URL_BASE))
-                .andExpect(MockMvcResultMatchers.status().isOk())
+        mockMvc.perform(MockMvcRequestBuilders.delete(URL_BASE + "/" + firstDirector.getId())
+                .with(mockUser())).andExpect(MockMvcResultMatchers.status().isOk());
+        mockMvc.perform(MockMvcRequestBuilders.get(URL_BASE)
+                        .with(mockUser())).andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].name").value(DIRECTOR_TWO));
     }
 
+    @Test
+    @DirtiesContext
+    void delete_Unauthorized() throws Exception {
+        Director firstDirector = Director.builder().name(DIRECTOR_ONE).build();
+        Director secondDirector = Director.builder().name(DIRECTOR_TWO).build();
+
+        directorRepository.saveAll(
+                List.of(
+                        firstDirector,
+                        secondDirector
+                )
+        );
+
+        mockMvc.perform(MockMvcRequestBuilders.delete(URL_BASE + "/" + firstDirector.getId()))
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized());
+        mockMvc.perform(MockMvcRequestBuilders.get(URL_BASE))
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized());
+    }
 
     @Test
     @DirtiesContext
@@ -159,10 +229,10 @@ class DirectorControllerTest {
                         Director.builder().name(DIRECTOR_TWO).build()
                 )
         );
-        mockMvc.perform(MockMvcRequestBuilders.delete(URL_BASE + "/" + 3))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-        mockMvc.perform(MockMvcRequestBuilders.get(URL_BASE))
-                .andExpect(MockMvcResultMatchers.status().isOk())
+        mockMvc.perform(MockMvcRequestBuilders.delete(URL_BASE + "/" + 3)
+                .with(mockUser())).andExpect(MockMvcResultMatchers.status().isOk());
+        mockMvc.perform(MockMvcRequestBuilders.get(URL_BASE)
+                        .with(mockUser())).andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)));
     }
