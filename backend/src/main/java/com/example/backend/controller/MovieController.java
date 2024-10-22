@@ -7,6 +7,9 @@ import com.example.backend.service.MovieService;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -48,12 +51,14 @@ public class MovieController {
     }
 
     @GetMapping("/watched")
-    public List<MovieResponse> getWatchedMovies() {
-        return movieService.getWatchedMovies().stream().map(MovieResponse::from).collect(Collectors.toList());
+    public List<MovieResponse> getWatchedMovies(@AuthenticationPrincipal OAuth2User user) {
+        return movieService.getWatchedMovies(user.getAttributes().get("login").toString()).stream()
+                .map(MovieResponse::from).collect(Collectors.toList());
     }
 
     @GetMapping("/wishlist")
-    public List<MovieResponse> getWishlistedMovies() {
-        return movieService.getWishlistedMovies().stream().map(MovieResponse::from).collect(Collectors.toList());
+    public List<MovieResponse> getWishlistedMovies(@AuthenticationPrincipal OAuth2User user) {
+        return movieService.getWishlistedMovies(user.getAttributes().get("login").toString()).stream()
+                .map(MovieResponse::from).collect(Collectors.toList());
     }
 }

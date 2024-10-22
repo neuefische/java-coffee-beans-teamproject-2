@@ -45,12 +45,6 @@ class ActorControllerTest {
     @Autowired
     private ActorRepository actorRepository;
 
-    @Autowired
-    private MovieRepository movieRepository;
-
-    @Autowired
-    private MovieActorRelationRepository movieActorRelationRepository;
-
     @Test
     @DirtiesContext
     void saveTest_correct() throws Exception {

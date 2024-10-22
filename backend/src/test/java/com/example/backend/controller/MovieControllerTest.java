@@ -1,12 +1,15 @@
 package com.example.backend.controller;
 
-import com.example.backend.model.*;
+import com.example.backend.model.Movie;
+import com.example.backend.model.MovieRepository;
+import com.example.backend.model.Rating;
+import com.example.backend.model.RatingRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.OidcLoginRequestPostProcessor;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -14,7 +17,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.List;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -26,8 +29,6 @@ class MovieControllerTest {
     private static final String URL_WATCHED = "/api/movie/watched";
     private static final String URL_WISHLIST = "/api/movie/wishlist";
 
-    private static final String ID_FIRST = "1";
-
     private static final String NAME_FIRST = "Memento";
     private static final String NAME_SECOND = "Deadpool";
     private static final String NAME_THIRD = "Third";
@@ -35,16 +36,17 @@ class MovieControllerTest {
     private static final int RATING_ONE = 1;
     private static final int RATING_TWO = 2;
 
-    private SecurityMockMvcRequestPostProcessors.OidcLoginRequestPostProcessor mockUser() {
-        return oidcLogin().userInfoToken(token -> token
-                .claim("login", NAME_FIRST));
-    }
+    private static final String USER_FIRST = "First";
+    private static final String USER_SECOND = "Second";
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
     private MovieRepository movieRepository;
+
+    @Autowired
+    private RatingRepository ratingRepository;
 
     @Test
     @DirtiesContext
@@ -54,8 +56,7 @@ class MovieControllerTest {
                         .content(
                                 """
                                         {
-                                            "name": "%s",
-                                            "isWatched": true
+                                            "name": "%s"
                                         }
                                         """.formatted(NAME_FIRST)
                         )
@@ -64,7 +65,6 @@ class MovieControllerTest {
         List<Movie> actualMovies = movieRepository.findAll();
         assertEquals(1, actualMovies.size());
         assertEquals(NAME_FIRST, actualMovies.getFirst().getName());
-        assertEquals(true, actualMovies.getFirst().isWatched());
     }
 
     @Test
@@ -307,15 +307,24 @@ class MovieControllerTest {
     @Test
     @DirtiesContext
     void getWatchedMoviesTest_successful() throws Exception {
-        Movie movieWatchedFirst = Movie.builder().name(NAME_FIRST).isWatched(true).rating(RATING_ONE).build();
-        Movie movieWatchedSecond = Movie.builder().name(NAME_SECOND).isWatched(true).rating(RATING_TWO).build();
-        Movie movieWishlisted = Movie.builder().name(NAME_THIRD).isWatched(false).rating(RATING_ONE).build();
+        Movie movieWatchedFirst = Movie.builder().name(NAME_FIRST).build();
+        Movie movieWatchedSecond = Movie.builder().name(NAME_SECOND).build();
+        Movie movieWishlisted = Movie.builder().name(NAME_THIRD).build();
 
         movieRepository.saveAll(
                 List.of(
                         movieWatchedFirst,
                         movieWatchedSecond,
                         movieWishlisted
+                )
+        );
+
+        ratingRepository.saveAll(
+                List.of(
+                        Rating.builder().movieId(movieWatchedFirst.getId()).userId(USER_FIRST).isWatched(true).rating(RATING_ONE).build(),
+                        Rating.builder().movieId(movieWatchedSecond.getId()).userId(USER_FIRST).isWatched(true).rating(RATING_TWO).build(),
+                        Rating.builder().movieId(movieWishlisted.getId()).userId(USER_FIRST).isWatched(false).rating(RATING_ONE).build(),
+                        Rating.builder().movieId(movieWishlisted.getId()).userId(USER_SECOND).isWatched(true).rating(RATING_TWO).build()
                 )
         );
 
@@ -325,26 +334,12 @@ class MovieControllerTest {
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].name").value(NAME_FIRST))
-                .andExpect(jsonPath("$[1].name").value(NAME_SECOND))
-                .andExpect(jsonPath("$[0].rating").value(RATING_ONE))
-                .andExpect(jsonPath("$[1].rating").value(RATING_TWO));
+                .andExpect(jsonPath("$[1].name").value(NAME_SECOND));
     }
 
     @Test
     @DirtiesContext
     void getWatchedMoviesTest_Unauthorized() throws Exception {
-        Movie movieWatchedFirst = Movie.builder().name(NAME_FIRST).isWatched(true).rating(RATING_ONE).build();
-        Movie movieWatchedSecond = Movie.builder().name(NAME_SECOND).isWatched(true).rating(RATING_TWO).build();
-        Movie movieWishlisted = Movie.builder().name(NAME_THIRD).isWatched(false).rating(RATING_ONE).build();
-
-        movieRepository.saveAll(
-                List.of(
-                        movieWatchedFirst,
-                        movieWatchedSecond,
-                        movieWishlisted
-                )
-        );
-
         mockMvc.perform(MockMvcRequestBuilders.get(URL_WATCHED))
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized());
     }
@@ -352,15 +347,24 @@ class MovieControllerTest {
     @Test
     @DirtiesContext
     void getWatchedMoviesTest_empty() throws Exception {
-        Movie movieWatchedFirst = Movie.builder().name(NAME_FIRST).isWatched(false).rating(RATING_ONE).build();
-        Movie movieWatchedSecond = Movie.builder().name(NAME_SECOND).isWatched(false).rating(RATING_TWO).build();
-        Movie movieWishlisted = Movie.builder().name(NAME_THIRD).isWatched(false).rating(RATING_ONE).build();
+        Movie movieWishlistedFirst = Movie.builder().name(NAME_FIRST).build();
+        Movie movieWishlistedSecond = Movie.builder().name(NAME_SECOND).build();
+        Movie movieWishlistedThird = Movie.builder().name(NAME_THIRD).build();
 
         movieRepository.saveAll(
                 List.of(
-                        movieWatchedFirst,
-                        movieWatchedSecond,
-                        movieWishlisted
+                        movieWishlistedFirst,
+                        movieWishlistedSecond,
+                        movieWishlistedThird
+                )
+        );
+
+        ratingRepository.saveAll(
+                List.of(
+                        Rating.builder().movieId(movieWishlistedFirst.getId()).userId(USER_FIRST).isWatched(false).rating(RATING_ONE).build(),
+                        Rating.builder().movieId(movieWishlistedSecond.getId()).userId(USER_FIRST).isWatched(false).rating(RATING_TWO).build(),
+                        Rating.builder().movieId(movieWishlistedThird.getId()).userId(USER_FIRST).isWatched(false).rating(RATING_ONE).build(),
+                        Rating.builder().movieId(movieWishlistedThird.getId()).userId(USER_SECOND).isWatched(true).rating(RATING_TWO).build()
                 )
         );
 
@@ -374,15 +378,24 @@ class MovieControllerTest {
     @Test
     @DirtiesContext
     void getWishlistedMoviesTest_successful() throws Exception {
-        Movie movieWatchedFirst = Movie.builder().name(NAME_FIRST).isWatched(false).rating(RATING_ONE).build();
-        Movie movieWatchedSecond = Movie.builder().name(NAME_SECOND).isWatched(false).rating(RATING_TWO).build();
-        Movie movieWishlisted = Movie.builder().name(NAME_THIRD).isWatched(true).rating(RATING_ONE).build();
+        Movie movieWishlistedFirst = Movie.builder().name(NAME_FIRST).build();
+        Movie movieWishlistedSecond = Movie.builder().name(NAME_SECOND).build();
+        Movie movieWatchedFirst = Movie.builder().name(NAME_THIRD).build();
 
         movieRepository.saveAll(
                 List.of(
-                        movieWatchedFirst,
-                        movieWatchedSecond,
-                        movieWishlisted
+                        movieWishlistedFirst,
+                        movieWishlistedSecond,
+                        movieWatchedFirst
+                )
+        );
+
+        ratingRepository.saveAll(
+                List.of(
+                        Rating.builder().movieId(movieWishlistedFirst.getId()).userId(USER_FIRST).isWatched(false).rating(RATING_ONE).build(),
+                        Rating.builder().movieId(movieWishlistedSecond.getId()).userId(USER_FIRST).isWatched(false).rating(RATING_TWO).build(),
+                        Rating.builder().movieId(movieWatchedFirst.getId()).userId(USER_FIRST).isWatched(true).rating(RATING_ONE).build(),
+                        Rating.builder().movieId(movieWatchedFirst.getId()).userId(USER_SECOND).isWatched(false).rating(RATING_TWO).build()
                 )
         );
 
@@ -392,26 +405,12 @@ class MovieControllerTest {
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].name").value(NAME_FIRST))
-                .andExpect(jsonPath("$[1].name").value(NAME_SECOND))
-                .andExpect(jsonPath("$[0].rating").value(RATING_ONE))
-                .andExpect(jsonPath("$[1].rating").value(RATING_TWO));
+                .andExpect(jsonPath("$[1].name").value(NAME_SECOND));
     }
 
     @Test
     @DirtiesContext
     void getWishlistedMoviesTest_Unauthorized() throws Exception {
-        Movie movieWatchedFirst = Movie.builder().name(NAME_FIRST).isWatched(false).rating(RATING_ONE).build();
-        Movie movieWatchedSecond = Movie.builder().name(NAME_SECOND).isWatched(false).rating(RATING_TWO).build();
-        Movie movieWishlisted = Movie.builder().name(NAME_THIRD).isWatched(true).rating(RATING_ONE).build();
-
-        movieRepository.saveAll(
-                List.of(
-                        movieWatchedFirst,
-                        movieWatchedSecond,
-                        movieWishlisted
-                )
-        );
-
         mockMvc.perform(MockMvcRequestBuilders.get(URL_WISHLIST))
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized());
     }
@@ -419,15 +418,24 @@ class MovieControllerTest {
     @Test
     @DirtiesContext
     void getWishlistedMoviesTest_empty() throws Exception {
-        Movie movieWatchedFirst = Movie.builder().name(NAME_FIRST).isWatched(true).rating(RATING_ONE).build();
-        Movie movieWatchedSecond = Movie.builder().name(NAME_SECOND).isWatched(true).rating(RATING_TWO).build();
-        Movie movieWishlisted = Movie.builder().name(NAME_THIRD).isWatched(true).rating(RATING_ONE).build();
+        Movie movieWatchedFirst = Movie.builder().name(NAME_FIRST).build();
+        Movie movieWatchedSecond = Movie.builder().name(NAME_SECOND).build();
+        Movie movieWatchedThird = Movie.builder().name(NAME_THIRD).build();
 
         movieRepository.saveAll(
                 List.of(
                         movieWatchedFirst,
                         movieWatchedSecond,
-                        movieWishlisted
+                        movieWatchedThird
+                )
+        );
+
+        ratingRepository.saveAll(
+                List.of(
+                        Rating.builder().movieId(movieWatchedFirst.getId()).userId(USER_FIRST).isWatched(true).rating(RATING_ONE).build(),
+                        Rating.builder().movieId(movieWatchedSecond.getId()).userId(USER_FIRST).isWatched(true).rating(RATING_TWO).build(),
+                        Rating.builder().movieId(movieWatchedThird.getId()).userId(USER_FIRST).isWatched(true).rating(RATING_ONE).build(),
+                        Rating.builder().movieId(movieWatchedThird.getId()).userId(USER_SECOND).isWatched(false).rating(RATING_TWO).build()
                 )
         );
 
@@ -436,5 +444,10 @@ class MovieControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(0)));
+    }
+
+    private OidcLoginRequestPostProcessor mockUser() {
+        return oidcLogin().userInfoToken(token -> token
+                .claim("login", USER_FIRST));
     }
 }

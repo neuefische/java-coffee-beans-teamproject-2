@@ -9,10 +9,19 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Builder
 @With
 @Data
-@Document("Movie")
-public class Movie {
+@Document("Rating")
+public class Rating {
+    public static final int MIN_RATING = 1;
+    public static final int MAX_RATING = 10;
+
     @Id
     private String id;
 
-    private String name;
+    private String movieId;
+
+    private String userId;
+
+    private Integer rating;
+
+    private boolean isWatched;
 }
