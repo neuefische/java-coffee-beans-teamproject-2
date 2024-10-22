@@ -1,12 +1,15 @@
 import ListElement from "./MovieList/ListElement.tsx";
+import MovieType from "../../../../Type/MovieType.tsx";
 
-export default function MovieList() {
+export default function MovieList({ data }: { data: MovieType[] }) {
     return (
         <div>
             MovieList
-            {/*  Foreach:  */}
-            <ListElement/>
-            {/*  End Foreach  */}
+            <div>
+                {data?.map(
+                    (movie) => <ListElement key={movie.id} movie={movie} />
+                )}
+            </div>
         </div>
     );
 }
