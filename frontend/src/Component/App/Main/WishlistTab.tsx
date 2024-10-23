@@ -1,19 +1,17 @@
-import EditMovieForm from "../EditMovieForm.tsx";
 import {useFetch} from "../../../Hooks/useFetch.ts";
-import MovieType from "../../../Type/MovieType.tsx";
 import WishList from "./Tab/MovieList/WishList.tsx";
+import MovieRatingType from "../../../Type/MovieRatingType.tsx";
 
 export default function WishlistTab() {
-    const {data, state } = useFetch<MovieType>("http://localhost:5173/api/movie/wishlist");
+    const {data, state} = useFetch<MovieRatingType>("http://localhost:5173/api/movie/wishlist");
     if (state === "loading") {
         return <div>Loading...</div>;
     }
 
     return (
-        <div>
-            WishlistTab
-            <WishList data={data} />
-            <EditMovieForm/>
+        <div className={"wishlistTab"}>
+            <h2>To be watched movies:</h2>
+            <WishList data={data}/>
         </div>
     );
 }
