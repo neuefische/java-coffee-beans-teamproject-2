@@ -1,16 +1,14 @@
 import {useEffect, useState} from "react";
 import axios from "axios";
-import {useParams} from "react-router-dom";
 import PersonList from "./MovieDetails/PersonList.tsx";
 import MovieType from "../../../Type/MovieType.tsx";
 import PersonType from "../../../Type/PersonType.tsx";
 
 import RatingType from "../../../Type/RatingType.tsx";
 
-export default function MovieDetails() {
+export default function MovieDetails({id}: {id: string}) {
     const errorMessage = "Something went wrong";
 
-    const {id} = useParams();
     const [movieData, setMovieData] = useState<MovieType>();
     const [ratingData, setRatingData] = useState<RatingType>();
     const [actorsData, setActorsData] = useState<PersonType[]>([]);
