@@ -55,7 +55,7 @@ public class MovieService {
                                     ).findFirst().orElse(null)
                             );
                         }
-                ).filter((ratingMoviePair -> ratingMoviePair.getSecond() != null))
+                ).filter(ratingMoviePair -> ratingMoviePair.getSecond() != null)
                 .toList();
     }
 

@@ -19,14 +19,16 @@ public class RatingController {
 
     @PostMapping
     public void save(@RequestBody @NotNull CreateRatingRequest request, @AuthenticationPrincipal OAuth2User user) {
-        Rating rating = request.toRating(user.getAttributes().get("login").toString());
+        String login = user.getAttributes().get("login").toString();
+        Rating rating = request.toRating(login);
 
         ratingService.save(rating);
     }
 
     @GetMapping("/{movieId}")
     public RatingResponse get(@AuthenticationPrincipal OAuth2User user, @PathVariable String movieId) {
-        Rating rating = ratingService.get(user.getAttributes().get("login").toString(), movieId);
+        String login = user.getAttributes().get("login").toString();
+        Rating rating = ratingService.get(login, movieId);
 
         return RatingResponse.from(rating);
     }
