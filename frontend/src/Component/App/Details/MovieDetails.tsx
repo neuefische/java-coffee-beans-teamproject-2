@@ -4,7 +4,7 @@ import {useParams} from "react-router-dom";
 import PersonList from "./MovieDetails/PersonList.tsx";
 import MovieType from "../../../Type/MovieType.tsx";
 import PersonType from "../../../Type/PersonType.tsx";
-import "../../../Style/Details.css"
+
 import RatingType from "../../../Type/RatingType.tsx";
 
 export default function MovieDetails() {

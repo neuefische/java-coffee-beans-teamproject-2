@@ -1,0 +1,12 @@
+.main_container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%
+}
+.wishlistTab .watchedTab {
+    width: 45%;
+    margin: 0 10px;
+    display: inline-flex;
+}

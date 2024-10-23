@@ -1,7 +1,7 @@
 export default function EditMovieForm() {
     return (
-        <div>
-            EditMovieForm
+        <div className={"edit_form"}>
+            <span>EditMovieForm</span>
         </div>
     );
 }
