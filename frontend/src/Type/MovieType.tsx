@@ -1,7 +1,7 @@
 
 type MovieType = {
     id: string,
-    movieName: string
+    name: string
     isWatched: boolean,
     rating: number
 }

@@ -5,18 +5,27 @@ import PersonList from "./MovieDetails/PersonList.tsx";
 import MovieType from "../../../Type/MovieType.tsx";
 import PersonType from "../../../Type/PersonType.tsx";
 import "../../../Style/Details.css"
+import RatingType from "../../../Type/RatingType.tsx";
 
 export default function MovieDetails() {
     const errorMessage = "Something went wrong";
 
     const {id} = useParams();
     const [movieData, setMovieData] = useState<MovieType>();
+    const [ratingData, setRatingData] = useState<RatingType>();
     const [actorsData, setActorsData] = useState<PersonType[]>([]);
     const [directorsData, setDirectorsData] = useState<PersonType[]>([]);
 
     const updateMovieData = function () {
         axios.get<MovieType>("/api/movie/" + id).then(
             (result) => setMovieData(result.data)
+        ).catch(
+            () => console.log(errorMessage)
+        )
+    }
+    const updateRatingData= function () {
+        axios.get<RatingType>("/api/rating/" + id).then(
+            (result) => setRatingData(result.data)
         ).catch(
             () => console.log(errorMessage)
         )
@@ -37,6 +46,7 @@ export default function MovieDetails() {
     }
 
     useEffect(updateMovieData, [id]);
+    useEffect(updateRatingData, [id]);
     useEffect(updateActorsData, [id]);
     useEffect(updateDirectorsData, [id]);
 
@@ -46,10 +56,10 @@ export default function MovieDetails() {
                 <label htmlFor="title">Title</label>
                 <input type="text" name="title" value={movieData?.name} disabled/>
                 <label htmlFor="is-watched">Is watched</label>
-                <input type="text" name="is-watched" value={String(movieData?.isWatched)} disabled/>
+                <input type="text" name="is-watched" value={String(ratingData?.isWatched)} disabled/>
                 <label htmlFor="rating">Rating</label>
-                <input type="text" name="rating" value={movieData?.rating} disabled/>
-                {directorsData && <PersoncdList people={directorsData} legend={"Directed by"}/>}
+                <input type="text" name="rating" value={ratingData?.rating} disabled/>
+                {directorsData && <PersonList people={directorsData} legend={"Directed by"}/>}
                 {actorsData && <PersonList people={actorsData} legend={"Starring"}/>}
             </form>
         </div>
