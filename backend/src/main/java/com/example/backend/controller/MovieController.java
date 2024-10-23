@@ -55,14 +55,14 @@ public class MovieController {
     @GetMapping("/watched")
     public List<MovieRatingResponse> getWatchedMovies(@AuthenticationPrincipal OAuth2User user) {
         return movieService.getWatchedMovies(user.getAttributes().get("login").toString()).stream()
-                .map(ratingMoviePair -> MovieRatingResponse.from(ratingMoviePair.getSecond(), ratingMoviePair.getFirst()))
+                .map(ratingMoviePair -> MovieRatingResponse.from(ratingMoviePair.getFirst(), ratingMoviePair.getSecond()))
                 .collect(Collectors.toList());
     }
 
     @GetMapping("/wishlist")
     public List<MovieRatingResponse> getWishlistedMovies(@AuthenticationPrincipal OAuth2User user) {
         return movieService.getWishlistedMovies(user.getAttributes().get("login").toString()).stream()
-                .map(ratingMoviePair -> MovieRatingResponse.from(ratingMoviePair.getSecond(), ratingMoviePair.getFirst()))
+                .map(ratingMoviePair -> MovieRatingResponse.from(ratingMoviePair.getFirst(), ratingMoviePair.getSecond()))
                 .collect(Collectors.toList());
     }
 }
