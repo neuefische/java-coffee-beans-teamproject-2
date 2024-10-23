@@ -1,8 +1,8 @@
-import MovieType from "../../../../../Type/MovieType.tsx";
 import ListElement from "./ListElement.tsx";
+import MovieRatingType from "../../../../../Type/MovieRatingType.tsx";
 
 
-export default function WatchedList({ data }: { data: MovieType[] }) {
+export default function WatchedList({ data }: { data: MovieRatingType[] }) {
     return (
         <div>
             MovieList

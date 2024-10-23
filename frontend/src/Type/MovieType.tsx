@@ -1,9 +1,7 @@
 
 type MovieType = {
     id: string,
-    movieName: string
-    isWatched: boolean,
-    rating: number
+    name: string
 }
 
 export default MovieType;
