@@ -52,10 +52,10 @@ public class MovieService {
                                     rating,
                                     movies.stream().filter(
                                             (Movie movie) -> movie.getId().equals(rating.getMovieId())
-                                    ).findFirst().orElse(null)
+                                    ).findFirst().orElse(new Movie())
                             );
                         }
-                ).filter(ratingMoviePair -> ratingMoviePair.getSecond() != null)
+                ).filter(ratingMoviePair -> ratingMoviePair.getSecond().getId() != null)
                 .toList();
     }
 
