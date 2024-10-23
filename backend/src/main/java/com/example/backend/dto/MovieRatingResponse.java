@@ -6,10 +6,10 @@ import lombok.Builder;
 import lombok.NonNull;
 
 @Builder
-public record MovieRatingResponse(@NonNull String id, @NonNull String movieName, Integer rating, boolean isWatched) {
+public record MovieRatingResponse(@NonNull String movieId, @NonNull String movieName, Integer rating, boolean isWatched) {
     public static MovieRatingResponse from(Rating rating, Movie movie) {
         return MovieRatingResponse.builder()
-                .id(movie.getId())
+                .movieId(movie.getId())
                 .movieName(movie.getName())
                 .rating(rating.getRating())
                 .isWatched(rating.isWatched())
