@@ -6,8 +6,8 @@ export default function Main() {
     return (
         <div>
             Main
-            <WatchedTab />
-            <WishlistTab />
+            <WatchedTab/>
+            <WishlistTab/>
         </div>
     );
 }

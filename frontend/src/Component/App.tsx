@@ -5,15 +5,14 @@ import Header from "./App/Header.tsx";
 import Footer from "./App/Footer.tsx";
 
 function App() {
-
     return (
         <>
-            <Header />
+            <Header/>
             <Routes>
-                <Route path="/" element={<Main />}/>
-                <Route path="/movie/:id" element={<Details />}/>
+                <Route path="/" element={<Main/>}/>
+                <Route path="/movie/:id" element={<Details/>}/>
             </Routes>
-            <Footer />
+            <Footer/>
         </>
     )
 }
