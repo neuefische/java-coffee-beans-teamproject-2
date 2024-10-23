@@ -4,12 +4,11 @@ import {useFetch} from "../../../Hooks/useFetch.ts";
 import MovieType from "../../../Type/MovieType.tsx";
 
 export default function WishlistTab() {
-    const {data, state } = useFetch<MovieType[]>("http://localhost:5173/api/movie/wishlist");
-    const flatData = Array.isArray(data) ? data.flat() : [];
+    const {data, state } = useFetch<MovieType>("http://localhost:5173/api/movie/wishlist");
     return (
         <div>
             WishlistTab
-            <MovieList data={flatData} />
+            <MovieList data={data} />
             <EditMovieForm/>
         </div>
     );
