@@ -1,6 +1,6 @@
 import MovieDetails from "./Details/MovieDetails.tsx";
 import MovieControls from "./Details/MovieControls.tsx";
-import {ChangeEvent, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import EditMovieForm from "./EditMovieForm.tsx";
 import "../../Style/Details.css"
 import {useParams} from "react-router-dom";
@@ -41,21 +41,6 @@ export default function Details() {
         )
     }
 
-    const handleMovieChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const {name, value} = event.target;
-        setMovieData(prevState => ({
-            ...prevState,
-            [name]: value,
-        }));
-    }
-
-    const handleRatingChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const {name, value} = event.target;
-        setRatingData(prevState => ({
-            ...prevState,
-            [name]: value,
-        }));
-    }
 
     useEffect(updateMovieData, [id]);
     useEffect(updateRatingData, [id]);
@@ -64,7 +49,7 @@ export default function Details() {
         <div>
             Details
             {editModeEnabled ?
-                <EditMovieForm id={id} handleMovieChange={handleMovieChange} handleRatingChange={handleRatingChange}
+                <EditMovieForm id={id} setMovieData={setMovieData} setRatingData={setRatingData}
                                movieData={movieData} ratingData={ratingData}/> :
                 <MovieDetails id={id ?? ""}/>}
             <MovieControls editModeEnabled={editModeEnabled} setEditModeEnabled={setEditModeEnabled}

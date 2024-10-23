@@ -5,21 +5,36 @@ import PersonType from "../../Type/PersonType.tsx";
 import axios from "axios";
 import PersonList from "./Details/MovieDetails/PersonList.tsx";
 
-export default function EditMovieForm({id, handleMovieChange, handleRatingChange, ratingData, movieData}:
+export default function EditMovieForm({id, setMovieData, setRatingData, ratingData, movieData}:
                                           {
                                               id: string | undefined,
-                                              handleMovieChange: (event: ChangeEvent<HTMLInputElement>) => void,
-                                              handleRatingChange: (event: ChangeEvent<HTMLInputElement>) => void,
+                                              setMovieData: React.Dispatch<React.SetStateAction<MovieType>>,
+                                              setRatingData: React.Dispatch<React.SetStateAction<RatingType>>,
                                               ratingData: RatingType, movieData: MovieType
                                           }
 ) {
 
-
     const errorMessage = "Something went wrong";
-
 
     const [actorsData, setActorsData] = useState<PersonType[]>([]);
     const [directorsData, setDirectorsData] = useState<PersonType[]>([]);
+
+
+    const handleMovieChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const {name, value} = event.target;
+        setMovieData(prevState => ({
+            ...prevState,
+            [name]: value,
+        }));
+    }
+
+    const handleRatingChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const {name, value} = event.target;
+        setRatingData(prevState => ({
+            ...prevState,
+            [name]: value,
+        }));
+    }
 
     const updateActorsData = function () {
         axios.get<PersonType[]>("/api/movie-actor/" + id).then(
