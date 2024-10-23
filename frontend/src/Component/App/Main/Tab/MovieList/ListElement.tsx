@@ -1,7 +1,9 @@
-export default function ListElement() {
+import MovieType from "../../../../../Type/MovieType.tsx";
+
+export default function ListElement({ movie }: { movie: MovieType }) {
     return (
         <div>
-            ListElement
+            {movie.movieName}  {/* Use the movie object directly */}
         </div>
     );
 }

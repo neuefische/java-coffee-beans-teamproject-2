@@ -1,12 +1,9 @@
-import PersonType from "./PersonType.tsx";
 
 type MovieType = {
     id: string,
-    name: string
+    movieName: string
     isWatched: boolean,
-    rating: number,
-    directors: PersonType[];
-    actors: PersonType[]
+    rating: number
 }
 
 export default MovieType;
