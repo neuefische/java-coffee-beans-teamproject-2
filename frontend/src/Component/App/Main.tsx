@@ -29,6 +29,16 @@ export default function Main() {
             () => console.log("Something went wrong")
         )
         setIsUpdated(false);
+        setMovieData({
+            id: "",
+            name: ""
+        })
+        setRatingData({
+            id: "",
+            rating: 0,
+            isWatched: true,
+            movieId: ""
+        })
     }, [isUpdated]);
 
     const [movieData, setMovieData] = useState<MovieType>({
