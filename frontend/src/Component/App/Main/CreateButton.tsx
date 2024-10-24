@@ -24,8 +24,6 @@ export default function CreateButton(
     }
 
     return (
-        <div>
             <button onClick={create}>Create</button>
-        </div>
     );
 }

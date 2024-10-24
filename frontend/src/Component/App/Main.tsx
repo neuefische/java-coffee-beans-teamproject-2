@@ -42,15 +42,18 @@ export default function Main() {
         movieId: ""
     });
 
+
     return (
         <>
             <div className={"main_container"}>
                 <WatchedTab data={watchedListData}/>
                 <WishlistTab data={wishListData}/>
             </div>
-            <EditMovieForm id={undefined} movieData={movieData} ratingData={ratingData} setMovieData={setMovieData}
-                           setRatingData={setRatingData}/>
-            <CreateButton movieData={movieData} ratingData={ratingData} setIsUpdated={setIsUpdated}/>
+            <div className={"edit-form-main"}>
+                <EditMovieForm id={undefined} movieData={movieData} ratingData={ratingData} setMovieData={setMovieData}
+                               setRatingData={setRatingData}/>
+                <CreateButton movieData={movieData} ratingData={ratingData} setIsUpdated={setIsUpdated}/>
+            </div>
         </>
     );
 }

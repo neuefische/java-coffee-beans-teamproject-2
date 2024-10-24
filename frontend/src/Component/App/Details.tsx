@@ -47,7 +47,6 @@ export default function Details() {
 
     return (
         <div>
-            Details
             {editModeEnabled ?
                 <EditMovieForm id={id} setMovieData={setMovieData} setRatingData={setRatingData}
                                movieData={movieData} ratingData={ratingData}/> :
