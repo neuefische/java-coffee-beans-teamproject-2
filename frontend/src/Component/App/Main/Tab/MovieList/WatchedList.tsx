@@ -6,7 +6,7 @@ import ListHeaders from "../../ListHeaders.tsx";
 export default function WatchedList({data}: { data: MovieRatingType[] }) {
     return (
         <div>
-            <ListHeaders/>
+            <ListHeaders isWatched={true}/>
             <div>
                 {data?.map(
                     (movie) => <ListElement key={movie.movieId} movie={movie}/>

@@ -1,10 +1,15 @@
 import axios from "axios";
 import {useNavigate, useParams} from "react-router-dom";
 import {useState} from "react";
+import RatingType from "../../../Type/RatingType.tsx";
+import MovieType from "../../../Type/MovieType.tsx";
 
 export default function MovieControls(
-    {editModeEnabled, setEditModeEnabled}:
-        { editModeEnabled: boolean, setEditModeEnabled: (state: boolean) => void }) {
+    {editModeEnabled, setEditModeEnabled, ratingData, movieData}:
+        {
+            editModeEnabled: boolean, setEditModeEnabled: (state: boolean) => void,
+            ratingData: RatingType, movieData: MovieType
+        }) {
 
     const [saveButtonDisabled, setSaveButtonDisabled] = useState<boolean>(false);
     const [deleteButtonDisabled, setDeleteButtonDisabled] = useState<boolean>(false);
@@ -14,18 +19,17 @@ export default function MovieControls(
 
     const navigate = useNavigate();
 
-    const save = () => {
+    const save = async () => {
         setSaveButtonDisabled(true);
-        axios.put(`/api/movie/${id}`).then(
-            // () => navigate("/")
-        ).catch(
-            () => alert("Something went wrong")
-        ).finally(
-            () => {
-                setEditModeEnabled(false);
-                setSaveButtonDisabled(false);
-            }
-        );
+        try {
+            await axios.put(`/api/movie/${id}`, movieData);
+            await axios.post(`/api/rating`, ratingData);
+        } catch {
+            alert("Something went wrong");
+        } finally {
+            setEditModeEnabled(false);
+            setSaveButtonDisabled(false);
+        }
     }
 
     const edit = () => {

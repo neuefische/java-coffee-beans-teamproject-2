@@ -1,5 +1,6 @@
 import axios from "axios";
 import {useEffect, useState} from "react";
+import {Link} from "react-router-dom";
 
 export default function Header() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -39,12 +40,16 @@ export default function Header() {
 
     return (
         <nav>
-            <div>
-                Hello {userName}
+            <Link to="/" className="navbar-title">
+                <i className="fa-duotone fa-solid fa-video"></i>
+                <h1>Movie Library</h1>
+            </Link>
+            <div className={"navbar-user"}>
+                <p>Hello {userName}</p>
+                <button onClick={handleButtonClick}>
+                    {isLoggedIn ? 'Logout' : 'Login'}
+                </button>
             </div>
-            <button onClick={handleButtonClick}>
-                {isLoggedIn ? 'Logout' : 'Login'}
-            </button>
         </nav>
     );
 }
