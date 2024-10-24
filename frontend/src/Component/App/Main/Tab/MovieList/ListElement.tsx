@@ -15,8 +15,10 @@ export default function ListElement({movie}: { movie: MovieRatingType }) {
 
                 {movie.isWatched ? (
                     <>
-                        <span className="movie-rating">{"★".repeat(movie.rating)}</span>
-                        <span className="empty-stars">{"★".repeat(10 - movie.rating)}</span>
+                        <div className="movie-rating">
+                            <span className="filled-stars">{"★".repeat(movie.rating)}</span>
+                            <span className="empty-stars">{"★".repeat(10 - movie.rating)}</span>
+                        </div>
                     </>
                 ) : (
                     <span className="movie-priority">Low</span>
