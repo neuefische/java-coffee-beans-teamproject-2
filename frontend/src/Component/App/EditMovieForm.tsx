@@ -4,6 +4,7 @@ import RatingType from "../../Type/RatingType.tsx";
 import PersonType from "../../Type/PersonType.tsx";
 import axios from "axios";
 import PersonList from "./Details/MovieDetails/PersonList.tsx";
+import AutoCompleteInput from "./EditMovieForm/AutoCompleteInput.tsx";
 
 export default function EditMovieForm({
                                           id,
@@ -65,6 +66,21 @@ export default function EditMovieForm({
     useEffect(updateActorsData, [id]);
     useEffect(updateDirectorsData, [id]);
 
+    const suggestions: PersonType[] = [
+        {
+            name: "Joe",
+            id: "Joe id"
+        },
+        {
+            name: "John",
+            id: "John id"
+        },
+        {
+            name: "Jane",
+            id: "Jane id"
+        },
+    ];
+
     return (
         <div className="edit_form-inner">
             <form>
@@ -111,6 +127,8 @@ export default function EditMovieForm({
                         onChange={(e) => handleRatingChange(e)}
                     />
                 </div>
+
+                <AutoCompleteInput suggestions={suggestions}/>
                 {directorsData && (
                     <PersonList people={directorsData} legend={"Directed by"} />
                 )}
