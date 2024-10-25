@@ -51,12 +51,15 @@ export default function MovieDetails({id}: {id: string}) {
     return (
         <div className="movie-details">
             <form>
-                <label htmlFor="title">Title</label>
-                <input type="text" name="title" value={movieData?.name} disabled/>
-                <label htmlFor="is-watched">Is watched</label>
-                <input type="text" name="is-watched" value={String(ratingData?.isWatched)} disabled/>
-                <label htmlFor="rating">Rating</label>
-                <input type="text" name="rating" value={ratingData?.rating} disabled/>
+                <div className={"movie_stats"}>
+                    <h4>Title</h4>
+                    <p>{movieData?.name}</p>
+                </div>
+                <h4>Is it watched already?</h4>
+                <p>{String(ratingData?.isWatched)}</p>
+                <h4>Rating:</h4>
+                <p>{ratingData?.rating} </p>
+
                 {directorsData && <PersonList people={directorsData} legend={"Directed by"}/>}
                 {actorsData && <PersonList people={actorsData} legend={"Starring"}/>}
             </form>

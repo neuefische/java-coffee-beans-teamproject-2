@@ -30,7 +30,7 @@ export default function EditablePersonList({legend, staff, setStaff, autocomplet
         <fieldset className="person-list">
             <legend>{legend}</legend>
             <AutoCompleteInput autocompletionUrl={autocompletionUrl} person={person} setPerson={setPerson}/>
-            <button onClick={addPerson}>Add</button>
+            <button onClick={addPerson} disabled={!person.name}>Add</button>
             {Array.isArray(staff) && staff.length > 0 ? (
                     staff.map((person) => (
                         <div key={person.id} className="person-list">
