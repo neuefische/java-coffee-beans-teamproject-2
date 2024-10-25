@@ -3,8 +3,7 @@ import MovieType from "../../Type/MovieType.tsx";
 import RatingType from "../../Type/RatingType.tsx";
 import PersonType from "../../Type/PersonType.tsx";
 import axios from "axios";
-import PersonList from "./Details/MovieDetails/PersonList.tsx";
-import AutoCompleteInput from "./EditMovieForm/AutoCompleteInput.tsx";
+import EditablePersonList from "./EditMovieForm/EditablePersonList.tsx";
 
 export default function EditMovieForm({
                                           id,
@@ -19,7 +18,6 @@ export default function EditMovieForm({
     ratingData: RatingType;
     movieData: MovieType;
 }) {
-    const errorMessage = "Something went wrong";
 
     const [actorsData, setActorsData] = useState<PersonType[]>([]);
     const [directorsData, setDirectorsData] = useState<PersonType[]>([]);
@@ -48,38 +46,6 @@ export default function EditMovieForm({
             [name]: booleanValue,
         }));
     };
-
-    const updateActorsData = function () {
-        axios
-            .get<PersonType[]>("/api/movie-actor/" + id)
-            .then((result) => setActorsData(result.data))
-            .catch(() => console.log(errorMessage));
-    };
-
-    const updateDirectorsData = function () {
-        axios
-            .get<PersonType[]>("/api/movie-director/" + id)
-            .then((result) => setDirectorsData(result.data))
-            .catch(() => console.log(errorMessage));
-    };
-
-    useEffect(updateActorsData, [id]);
-    useEffect(updateDirectorsData, [id]);
-
-    const suggestions: PersonType[] = [
-        {
-            name: "Joe",
-            id: "Joe id"
-        },
-        {
-            name: "John",
-            id: "John id"
-        },
-        {
-            name: "Jane",
-            id: "Jane id"
-        },
-    ];
 
     return (
         <div className="edit_form-inner">
@@ -128,11 +94,8 @@ export default function EditMovieForm({
                     />
                 </div>
 
-                <AutoCompleteInput suggestions={suggestions}/>
-                {directorsData && (
-                    <PersonList people={directorsData} legend={"Directed by"} />
-                )}
-                {actorsData && <PersonList people={actorsData} legend={"Starring"} />}
+                {<EditablePersonList legend={"Directed by"} autocompletionUrl={"/api/director/autocompletion"} staff={directorsData} setStaff={setDirectorsData}/>}
+                {<EditablePersonList legend={"Starring"} autocompletionUrl={"/api/actor/autocompletion"} staff={actorsData} setStaff={setActorsData}/>}
             </form>
         </div>
     );

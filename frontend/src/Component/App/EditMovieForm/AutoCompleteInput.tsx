@@ -1,40 +1,67 @@
-import {ChangeEvent, useState} from 'react';
+import {ChangeEvent, useEffect, useState} from 'react';
 import PersonType from "../../../Type/PersonType.tsx";
+import axios from "axios";
 
-const AutoCompleteInput = ({suggestions}: { suggestions: PersonType[] }) => {
-    const [inputValue, setInputValue] = useState<string>('');
-    const [personId, setPersonId] = useState<string>("");
+const AutoCompleteInput = ({autocompletionUrl, person, setPerson}
+                               :
+                               {
+                                   autocompletionUrl: string,
+                                   person: PersonType
+                                   setPerson: (person: PersonType) => void
+                               }
+) => {
+    const [suggestions, setSuggestions] = useState<PersonType[]>([]);
     const [filteredSuggestions, setFilteredSuggestions] = useState<PersonType[]>([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
 
-    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const userInput = event.target.value;
-        setInputValue(userInput);
+    const getSuggestions = function (prefix: string) {
+        axios.get<PersonType[]>(`${autocompletionUrl}/${prefix}`).then(
+            (result) => setSuggestions(result.data)
+        )
+    }
 
+    const updateRenderedSuggestions = function () {
         const filtered = suggestions.filter(suggestion =>
-            suggestion.name.toLowerCase().startsWith(userInput.toLowerCase())
+            suggestion.name.toLowerCase().startsWith(person.name.toLowerCase())
         );
 
         setFilteredSuggestions(filtered);
         setShowSuggestions(true);
+    }
+
+    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const userInput = event.target.value;
+        setPerson(
+            {
+                name: userInput,
+                id: ""
+            }
+        );
+        getSuggestions(userInput);
     };
 
     const handleClick = (suggestion: PersonType) => {
-        setInputValue(suggestion.name);
-        setPersonId(suggestion.id);
+        setPerson(
+            {
+                name: suggestion.name,
+                id: suggestion.id
+            }
+        );
         setFilteredSuggestions([]);
         setShowSuggestions(false);
     };
+
+    useEffect(updateRenderedSuggestions, [suggestions]);
 
     return (
         <div>
             <input
                 type="text"
-                value={inputValue}
+                value={person.name}
                 onChange={handleChange}
                 onFocus={() => setShowSuggestions(true)}
             />
-            {showSuggestions && inputValue && (
+            {showSuggestions && person.name && (
                 <ul>
                     {filteredSuggestions.map((suggestion, index) => (
                         <li key={index} onClick={
