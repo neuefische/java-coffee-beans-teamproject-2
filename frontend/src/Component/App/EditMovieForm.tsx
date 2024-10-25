@@ -87,7 +87,7 @@ export default function EditMovieForm({
                     </div>
                 </div>
                 <div className="form-row">
-                    <label htmlFor="rating">Rating</label>
+                    <label htmlFor="rating">Rating / Priority </label>
                     <input
                         type="text"
                         name="rating"
