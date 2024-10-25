@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -42,11 +43,9 @@ public class MovieActorService {
     }
 
     public void removeActor(String movieId, String actorId) {
-        MovieActorRelation relation = movieActorRelationRepository
-                .findByMovieIdAndActorId(movieId, actorId)
-                .orElseThrow();
-
-        movieActorRelationRepository.delete(relation);
+       Optional<MovieActorRelation> relation = movieActorRelationRepository
+                .findByMovieIdAndActorId(movieId, actorId);
+        relation.ifPresent(movieActorRelationRepository::delete);
     }
 
     public void removeRelationsByMovieId(String movieId) {

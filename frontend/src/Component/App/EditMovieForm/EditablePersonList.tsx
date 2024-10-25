@@ -23,6 +23,7 @@ export default function EditablePersonList({legend, staff, setStaff, autocomplet
                 person
             ]
         );
+        setPerson({id: "", name: ""});
     }
 
     return (
@@ -32,7 +33,7 @@ export default function EditablePersonList({legend, staff, setStaff, autocomplet
             <button onClick={addPerson}>Add</button>
             {Array.isArray(staff) && staff.length > 0 ? (
                     staff.map((person) => (
-                        <div>
+                        <div key={person.id} className="person-list">
                             <Person key={person.id} person={person} />
                             <DeletePersonButton person={person} setStaff={setStaff} staff={staff} deleteUrl={deleteUrl} movieId={movieId}/>
                         </div>

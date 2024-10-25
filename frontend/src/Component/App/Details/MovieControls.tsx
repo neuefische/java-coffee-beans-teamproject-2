@@ -54,7 +54,7 @@ export default function MovieControls(
                 if (actorInstance.id) {
                     const data = {
                         movieId: movieResponse.data.id,
-                        actorId: actorInstance.id
+                        personId: actorInstance.id
                     }
                     await axios.post<PersonType>(`/api/movie-actor`, data);
                 }
@@ -65,7 +65,7 @@ export default function MovieControls(
                 if (directorInstance.id) {
                     const data = {
                         movieId: movieResponse.data.id,
-                        directorId: directorInstance.id
+                        personId: directorInstance.id
                     }
                     await axios.post<PersonType>(`/api/movie-director`, data);
                 }

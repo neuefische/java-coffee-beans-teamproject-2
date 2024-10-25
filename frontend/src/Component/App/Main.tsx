@@ -46,6 +46,8 @@ export default function Main(
             isWatched: true,
             movieId: ""
         })
+        setActorsData([])
+        setDirectorsData([])
     }, [isUpdated, userName]);
 
     const [movieData, setMovieData] = useState<MovieType>({
