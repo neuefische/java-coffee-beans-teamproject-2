@@ -8,12 +8,15 @@ import RatingType from "../../Type/RatingType.tsx";
 import axios from "axios";
 import MovieRatingType from "../../Type/MovieRatingType.tsx";
 
-export default function Main() {
+export default function Main(
+    {userName}: { userName: string }
+) {
     const [wishListData, setWishListData] = useState<MovieRatingType[]>([]);
     const [watchedListData, setwatchedListData] = useState<MovieRatingType[]>([]);
 
     const [isUpdated, setIsUpdated] = useState(false);
     useEffect(() => {
+        if (!userName) return;
         axios.get<MovieRatingType[]>("/api/movie/wishlist").then(
             (result) => {
                 setWishListData(result.data)
@@ -39,7 +42,7 @@ export default function Main() {
             isWatched: true,
             movieId: ""
         })
-    }, [isUpdated]);
+    }, [isUpdated, userName]);
 
     const [movieData, setMovieData] = useState<MovieType>({
         id: "",
@@ -52,6 +55,15 @@ export default function Main() {
         movieId: ""
     });
 
+    if (!userName) {
+        return (
+            <>
+                <div className={"main_container"}>
+                    Please log in
+                </div>
+            </>
+        );
+    }
 
     return (
         <>
