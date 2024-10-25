@@ -1,29 +1,31 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import {ChangeEvent} from "react";
 import MovieType from "../../Type/MovieType.tsx";
 import RatingType from "../../Type/RatingType.tsx";
-import PersonType from "../../Type/PersonType.tsx";
-import axios from "axios";
 import EditablePersonList from "./EditMovieForm/EditablePersonList.tsx";
+import PersonType from "../../Type/PersonType.tsx";
 
 export default function EditMovieForm({
-                                          id,
                                           setMovieData,
                                           setRatingData,
                                           ratingData,
                                           movieData,
+                                          actorsData,
+                                          setActorsData,
+                                          directorsData,
+                                          setDirectorsData
                                       }: {
-    id: string | undefined;
     setMovieData: React.Dispatch<React.SetStateAction<MovieType>>;
     setRatingData: React.Dispatch<React.SetStateAction<RatingType>>;
     ratingData: RatingType;
     movieData: MovieType;
+    actorsData: PersonType[],
+    setActorsData: (personData: PersonType[]) => void,
+    directorsData: PersonType[],
+    setDirectorsData: (personData: PersonType[]) => void,
 }) {
 
-    const [actorsData, setActorsData] = useState<PersonType[]>([]);
-    const [directorsData, setDirectorsData] = useState<PersonType[]>([]);
-
     const handleMovieChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = event.target;
+        const {name, value} = event.target;
         setMovieData((prevState) => ({
             ...prevState,
             [name]: value,
@@ -31,7 +33,7 @@ export default function EditMovieForm({
     };
 
     const handleRatingChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = event.target;
+        const {name, value} = event.target;
         setRatingData((prevState) => ({
             ...prevState,
             [name]: value,
@@ -39,7 +41,7 @@ export default function EditMovieForm({
     };
 
     const handleRadioChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = event.target;
+        const {name, value} = event.target;
         const booleanValue = value === "true";
         setRatingData((prevState) => ({
             ...prevState,
@@ -94,8 +96,10 @@ export default function EditMovieForm({
                     />
                 </div>
 
-                {<EditablePersonList legend={"Directed by"} autocompletionUrl={"/api/director/autocompletion"} staff={directorsData} setStaff={setDirectorsData}/>}
-                {<EditablePersonList legend={"Starring"} autocompletionUrl={"/api/actor/autocompletion"} staff={actorsData} setStaff={setActorsData}/>}
+                {<EditablePersonList legend={"Directed by"} autocompletionUrl={"/api/director/autocompletion"}
+                                     staff={directorsData} setStaff={setDirectorsData}/>}
+                {<EditablePersonList legend={"Starring"} autocompletionUrl={"/api/actor/autocompletion"}
+                                     staff={actorsData} setStaff={setActorsData}/>}
             </form>
         </div>
     );

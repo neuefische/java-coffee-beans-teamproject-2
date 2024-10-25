@@ -1,19 +1,69 @@
 import axios from "axios";
 import RatingType from "../../../Type/RatingType.tsx";
 import MovieType from "../../../Type/MovieType.tsx";
+import PersonType from "../../../Type/PersonType.tsx";
+import personType from "../../../Type/PersonType.tsx";
 
 export default function CreateButton(
-    {ratingData, movieData, setIsUpdated}:
+    {
+        ratingData, movieData, setIsUpdated,
+        actorData, directorData
+    }:
         {
             ratingData: RatingType, movieData: MovieType
-            setIsUpdated: (state: boolean) => void
+            setIsUpdated: (state: boolean) => void,
+            actorData: PersonType[],
+            directorData: personType[]
         }) {
 
     const create = async function () {
         try {
+            const actors: PersonType[] = actorData.map(
+                async (actor) => {
+                    if (!actor.id) {
+                        const response = await axios.post<PersonType>(`/api/actor`, actor);
+                        actor.id = response.data.id;
+                    }
+
+                    return actor;
+                }
+            );
+
+            const directors: PersonType[] = directorData.map(
+                async (director) => {
+                    if (!director.id) {
+                        const response = await axios.post<PersonType>(`/api/director`, director);
+                        director.id = response.data.id;
+                    }
+
+                    return director;
+                }
+            );
+
             const response = await axios.post<MovieType>(`/api/movie`, movieData);
             ratingData.movieId = response.data.id;
             await axios.post(`/api/rating`, ratingData);
+
+            for (const actor of actors) {
+                if (actor.id) {
+                    const data = {
+                        movieId: movieData.id,
+                        actorId: actor.id
+                    }
+                    await axios.post<PersonType>(`/api/movie-actor`, data);
+                }
+            }
+
+            for (const director of directors) {
+                if (director.id) {
+                    const data = {
+                        movieId: movieData.id,
+                        directorId: director.id
+                    }
+                    await axios.post<PersonType>(`/api/movie-director`, data);
+                }
+            }
+
             setIsUpdated(true);
         } catch {
             alert("Something went wrong");
@@ -24,6 +74,6 @@ export default function CreateButton(
     }
 
     return (
-            <button onClick={create}>Create</button>
+        <button onClick={create}>Create</button>
     );
 }

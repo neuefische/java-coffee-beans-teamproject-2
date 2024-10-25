@@ -7,6 +7,7 @@ import {useParams} from "react-router-dom";
 import MovieType from "../../Type/MovieType.tsx";
 import RatingType from "../../Type/RatingType.tsx";
 import axios from "axios";
+import PersonType from "../../Type/PersonType.tsx";
 
 export default function Details() {
 
@@ -14,6 +15,9 @@ export default function Details() {
 
     const [editModeEnabled, setEditModeEnabled] = useState<boolean>(false);
     const {id} = useParams();
+
+    const [actorsData, setActorsData] = useState<PersonType[]>([]);
+    const [directorsData, setDirectorsData] = useState<PersonType[]>([]);
 
     const [movieData, setMovieData] = useState<MovieType>({
         id: "",
@@ -48,8 +52,10 @@ export default function Details() {
     return (
         <div>
             {editModeEnabled ?
-                <EditMovieForm id={id} setMovieData={setMovieData} setRatingData={setRatingData}
-                               movieData={movieData} ratingData={ratingData}/> :
+                <EditMovieForm setMovieData={setMovieData} setRatingData={setRatingData}
+                               movieData={movieData} ratingData={ratingData} actorsData={actorsData}
+                               setActorsData={setActorsData} directorsData={directorsData}
+                               setDirectorsData={setDirectorsData}/> :
                 <MovieDetails id={id ?? ""}/>}
             <MovieControls editModeEnabled={editModeEnabled} setEditModeEnabled={setEditModeEnabled}
                            ratingData={ratingData} movieData={movieData}/>
