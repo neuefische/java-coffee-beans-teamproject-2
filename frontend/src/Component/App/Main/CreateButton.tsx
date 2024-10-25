@@ -29,41 +29,42 @@ export default function CreateButton(
                 }
             );
 
-            // const directors: PersonType[] = directorData.map(
-            //     async (director) => {
-            //         if (!director.id) {
-            //             const response = await axios.post<PersonType>(`/api/director`, director);
-            //             director.id = response.data.id;
-            //         }
-            //
-            //         return director;
-            //     }
-            // );
+            const directors= directorData.map(
+                async (director) => {
+                    if (!director.id) {
+                        const response = await axios.post<PersonType>(`/api/director`, director);
+                        director.id = response.data.id;
+                    }
 
-            const response = await axios.post<MovieType>(`/api/movie`, movieData);
-            ratingData.movieId = response.data.id;
+                    return director;
+                }
+            );
+
+            const movieResponse = await axios.post<MovieType>(`/api/movie`, movieData);
+            ratingData.movieId = movieResponse.data.id;
             await axios.post(`/api/rating`, ratingData);
 
             for (const actor of actors) {
                 const actorInstance = await actor;
                 if (actorInstance.id) {
                     const data = {
-                        movieId: response.data.id,
+                        movieId: movieResponse.data.id,
                         actorId: actorInstance.id
                     }
                     await axios.post<PersonType>(`/api/movie-actor`, data);
                 }
             }
 
-            // for (const director of directors) {
-            //     if (director.id) {
-            //         const data = {
-            //             movieId: movieData.id,
-            //             directorId: director.id
-            //         }
-            //         await axios.post<PersonType>(`/api/movie-director`, data);
-            //     }
-            // }
+            for (const director of directors) {
+                const directorInstance = await director;
+                if (directorInstance.id) {
+                    const data = {
+                        movieId: movieResponse.data.id,
+                        directorId: directorInstance.id
+                    }
+                    await axios.post<PersonType>(`/api/movie-director`, data);
+                }
+            }
 
             setIsUpdated(true);
         } catch {

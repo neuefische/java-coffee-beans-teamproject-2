@@ -1,10 +1,13 @@
 package com.example.backend.service;
 
+import com.example.backend.model.Actor;
 import com.example.backend.model.Director;
 import com.example.backend.model.DirectorRepository;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -26,5 +29,9 @@ public class DirectorService {
 
     public void deleteDirector(String directorId) {
         directorRepository.findById(directorId).ifPresent(directorRepository::delete);
+    }
+
+    public List<Director> getDirectorsByPrefix(String prefix) {
+        return directorRepository.findByNameStartingWith(prefix);
     }
 }

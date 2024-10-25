@@ -37,7 +37,7 @@ const AutoCompleteInput = ({autocompletionUrl, person, setPerson}
                 id: ""
             }
         );
-        getSuggestions(userInput);
+        if (userInput) getSuggestions(userInput);
     };
 
     const handleClick = (suggestion: PersonType) => {
