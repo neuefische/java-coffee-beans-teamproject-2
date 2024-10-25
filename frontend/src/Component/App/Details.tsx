@@ -8,8 +8,9 @@ import MovieType from "../../Type/MovieType.tsx";
 import RatingType from "../../Type/RatingType.tsx";
 import axios from "axios";
 
-export default function Details() {
-
+export default function Details(
+    {userName}: { userName: string }
+) {
     const errorMessage = "Something went wrong";
 
     const [editModeEnabled, setEditModeEnabled] = useState<boolean>(false);
@@ -44,6 +45,10 @@ export default function Details() {
 
     useEffect(updateMovieData, [id]);
     useEffect(updateRatingData, [id]);
+
+    if (!userName) {
+        return;
+    }
 
     return (
         <div>
