@@ -96,9 +96,9 @@ export default function EditMovieForm({
                     />
                 </div>
 
-                {<EditablePersonList legend={"Directed by"} autocompletionUrl={"/api/director/autocompletion"}
+                {<EditablePersonList legend={"Directed by"} autocompletionUrl={"/api/director/autocompletion"} deleteUrl={"/api/movie-director"} movieId={movieData.id}
                                      staff={directorsData} setStaff={setDirectorsData}/>}
-                {<EditablePersonList legend={"Starring"} autocompletionUrl={"/api/actor/autocompletion"}
+                {<EditablePersonList legend={"Starring"} autocompletionUrl={"/api/actor/autocompletion"} deleteUrl={"/api/movie-actor"} movieId={movieData.id}
                                      staff={actorsData} setStaff={setActorsData}/>}
             </form>
         </div>
