@@ -1,7 +1,7 @@
 import PersonType from "../../../Type/PersonType.tsx";
 import Person from "../Details/MovieDetails/PersonList/Person.tsx";
 import AutoCompleteInput from "./AutoCompleteInput.tsx";
-import {useState} from "react";
+import {FormEvent, useState} from "react";
 
 export default function EditablePersonList({legend, staff, setStaff, autocompletionUrl}: {
     legend: string,
@@ -12,7 +12,8 @@ export default function EditablePersonList({legend, staff, setStaff, autocomplet
 
     const [person, setPerson] = useState<PersonType>({id: "", name: ""});
 
-    const addPerson = function () {
+    const addPerson = function (event: FormEvent) {
+        event.preventDefault();
         setStaff(
             [
                 ...staff,
