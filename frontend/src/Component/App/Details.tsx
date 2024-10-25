@@ -45,10 +45,26 @@ export default function Details(
             () => console.log(errorMessage)
         )
     }
+    const updateActorData = function () {
+        axios.get<PersonType[]>("/api/movie-actor/" + id).then(
+            (result) => setActorsData(result.data)
+        ).catch(
+            () => console.log(errorMessage)
+        )
+    }
+    const updateDirectorData = function () {
+        axios.get<PersonType[]>("/api/movie-director/" + id).then(
+            (result) => setDirectorsData(result.data)
+        ).catch(
+            () => console.log(errorMessage)
+        )
+    }
 
 
     useEffect(updateMovieData, [id]);
     useEffect(updateRatingData, [id]);
+    useEffect(updateActorData, [id]);
+    useEffect(updateDirectorData, [id]);
 
     if (!userName) {
         return;
@@ -63,7 +79,7 @@ export default function Details(
                                setDirectorsData={setDirectorsData}/> :
                 <MovieDetails id={id ?? ""}/>}
             <MovieControls editModeEnabled={editModeEnabled} setEditModeEnabled={setEditModeEnabled}
-                           ratingData={ratingData} movieData={movieData}/>
+                           ratingData={ratingData} movieData={movieData} actorData={actorsData} directorData={directorsData}/>
         </div>
     );
 }
