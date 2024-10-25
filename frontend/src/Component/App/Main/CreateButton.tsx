@@ -76,6 +76,6 @@ export default function CreateButton(
     }
 
     return (
-        <button onClick={create}>Create</button>
+        <button className={"create"} onClick={create}>Create</button>
     );
 }

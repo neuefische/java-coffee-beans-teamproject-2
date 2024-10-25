@@ -65,7 +65,9 @@ export default function Main(
         return (
             <>
                 <div className={"main_container"}>
-                    Please log in
+                    <div className={"loading_outer"}>
+                        <h2 className={"loading_inner"}>Please log in</h2>
+                    </div>
                 </div>
             </>
         );
@@ -82,7 +84,8 @@ export default function Main(
                                setRatingData={setRatingData} actorsData={actorsData}
                                setActorsData={setActorsData} directorsData={directorsData}
                                setDirectorsData={setDirectorsData}/>
-                <CreateButton movieData={movieData} ratingData={ratingData} setIsUpdated={setIsUpdated} actorData={actorsData} directorData={directorsData}/>
+                <CreateButton movieData={movieData} ratingData={ratingData} setIsUpdated={setIsUpdated}
+                              actorData={actorsData} directorData={directorsData}/>
             </div>
         </>
     );

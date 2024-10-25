@@ -33,14 +33,14 @@ export default function EditablePersonList({legend, staff, setStaff, autocomplet
             <button onClick={addPerson} disabled={!person.name}>Add</button>
             {Array.isArray(staff) && staff.length > 0 ? (
                     staff.map((person) => (
-                        <div key={person.id} className="person-list">
+                        <div key={person.id} className="person-list_inner">
                             <Person key={person.id} person={person} />
                             <DeletePersonButton person={person} setStaff={setStaff} staff={staff} deleteUrl={deleteUrl} movieId={movieId}/>
                         </div>
                     ))
                 )
                 : (
-                <div>No people available</div>
+                <div>None was added yet</div>
             )}
         </fieldset>
     );

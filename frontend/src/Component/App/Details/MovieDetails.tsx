@@ -50,19 +50,26 @@ export default function MovieDetails({id}: {id: string}) {
 
     return (
         <div className="movie-details">
-            <form>
-                <div className={"movie_stats"}>
-                    <h4>Title</h4>
-                    <p>{movieData?.name}</p>
-                </div>
-                <h4>Is it watched already?</h4>
-                <p>{String(ratingData?.isWatched)}</p>
-                <h4>Rating:</h4>
-                <p>{ratingData?.rating} </p>
+            <div className="movie-details-row movie_stats">
+                <h3>Title</h3>
+                <p>{movieData?.name}</p>
+            </div>
 
-                {directorsData && <PersonList people={directorsData} legend={"Directed by"}/>}
-                {actorsData && <PersonList people={actorsData} legend={"Starring"}/>}
-            </form>
+            <div className="movie-details-row">
+                <h3>Is it watched already?</h3>
+                <p>{ratingData ? "Yes" : "No"}</p>
+            </div>
+
+            <div className="movie-details-row">
+                <h3>Rating / Priority:</h3>
+                <p>{ratingData?.rating}</p>
+            </div>
+
+            <div className="people">
+                {directorsData && <PersonList people={directorsData} legend={"Directed by:"}/>}
+                {actorsData && <PersonList people={actorsData} legend={"Starring:"}/>}
+            </div>
         </div>
+
     );
 }

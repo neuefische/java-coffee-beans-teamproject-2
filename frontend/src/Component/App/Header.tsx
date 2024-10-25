@@ -46,17 +46,20 @@ export default function Header(
     }, []);
 
     return (
+        <div>
         <nav>
             <Link to="/" className="navbar-title">
                 <i className="fa-duotone fa-solid fa-video"></i>
                 <h1>Movie Library</h1>
             </Link>
             <div className={"navbar-user"}>
-                <p>Hello {userName}</p>
+                <p>Hello, {userName}</p>
                 <button onClick={handleButtonClick}>
                     {userName ? 'Logout' : 'Login'}
                 </button>
             </div>
         </nav>
+            <hr></hr>
+        </div>
     );
 }

@@ -99,10 +99,10 @@ export default function MovieControls(
     }
 
     return (
-        <div>
-            <button onClick={save} hidden={!editModeEnabled} disabled={saveButtonDisabled}>Save</button>
-            <button onClick={edit} hidden={editModeEnabled}>Edit</button>
-            <button onClick={remove} disabled={deleteButtonDisabled}>Delete</button>
+        <div className={"movie_controls"}>
+            <button className={"left_button"} onClick={save} hidden={!editModeEnabled} disabled={saveButtonDisabled}>Save</button>
+            <button className={"left_button"} onClick={edit} hidden={editModeEnabled}>Edit</button>
+            <button className={"right_button"} onClick={remove} disabled={deleteButtonDisabled}>Delete</button>
         </div>
     );
 }

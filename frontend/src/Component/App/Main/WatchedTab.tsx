@@ -7,7 +7,6 @@ export default function WatchedTab({data}: { data: MovieRatingType[] }) {
         <div className={"watchedTab"}>
             <h2>Already watched movies:</h2>
             <WatchedList data={data}/>
-
         </div>
     );
 }
