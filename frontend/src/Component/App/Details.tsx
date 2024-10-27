@@ -71,7 +71,7 @@ export default function Details(
     }
 
     return (
-        <div>
+        <div className={"details-main"}>
             {editModeEnabled ?
                 <EditMovieForm setMovieData={setMovieData} setRatingData={setRatingData}
                                movieData={movieData} ratingData={ratingData} actorsData={actorsData}

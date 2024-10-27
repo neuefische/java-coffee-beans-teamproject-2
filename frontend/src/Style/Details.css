@@ -161,6 +161,13 @@ input[disabled] {
     justify-content: center;
     align-items: center;
 }
+.details-main {
+    min-height: calc(80vh - 306.438px + 74px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
 
 body {
     font-family: 'Montserrat', sans-serif;
