@@ -8,6 +8,8 @@ export default function ListElement({movie}: { movie: MovieRatingType }) {
         navigate("/api/movie/" + movie.movieId);
     }
 
+    const wishlistRating = movie.rating >= 7 ? "High" :  movie.rating <= 3 ? "Low" : "Medium"
+
     return (
         <>
             <div className={"list-element"}>
@@ -21,7 +23,7 @@ export default function ListElement({movie}: { movie: MovieRatingType }) {
                         </div>
                     </>
                 ) : (
-                    <span className="movie-priority">Low</span>
+                    <span className="movie-priority">{wishlistRating}</span>
                 )}
 
                 <button className={"edit-button"} onClick={redirect}>Details</button>

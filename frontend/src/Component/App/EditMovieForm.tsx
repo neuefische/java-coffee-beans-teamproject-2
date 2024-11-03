@@ -1,30 +1,31 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import {ChangeEvent} from "react";
 import MovieType from "../../Type/MovieType.tsx";
 import RatingType from "../../Type/RatingType.tsx";
+import EditablePersonList from "./EditMovieForm/EditablePersonList.tsx";
 import PersonType from "../../Type/PersonType.tsx";
-import axios from "axios";
-import PersonList from "./Details/MovieDetails/PersonList.tsx";
 
 export default function EditMovieForm({
-                                          id,
                                           setMovieData,
                                           setRatingData,
                                           ratingData,
                                           movieData,
+                                          actorsData,
+                                          setActorsData,
+                                          directorsData,
+                                          setDirectorsData
                                       }: {
-    id: string | undefined;
     setMovieData: React.Dispatch<React.SetStateAction<MovieType>>;
     setRatingData: React.Dispatch<React.SetStateAction<RatingType>>;
     ratingData: RatingType;
     movieData: MovieType;
+    actorsData: PersonType[],
+    setActorsData: (personData: PersonType[]) => void,
+    directorsData: PersonType[],
+    setDirectorsData: (personData: PersonType[]) => void,
 }) {
-    const errorMessage = "Something went wrong";
-
-    const [actorsData, setActorsData] = useState<PersonType[]>([]);
-    const [directorsData, setDirectorsData] = useState<PersonType[]>([]);
 
     const handleMovieChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = event.target;
+        const {name, value} = event.target;
         setMovieData((prevState) => ({
             ...prevState,
             [name]: value,
@@ -32,7 +33,7 @@ export default function EditMovieForm({
     };
 
     const handleRatingChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = event.target;
+        const {name, value} = event.target;
         setRatingData((prevState) => ({
             ...prevState,
             [name]: value,
@@ -40,30 +41,13 @@ export default function EditMovieForm({
     };
 
     const handleRadioChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = event.target;
+        const {name, value} = event.target;
         const booleanValue = value === "true";
         setRatingData((prevState) => ({
             ...prevState,
             [name]: booleanValue,
         }));
     };
-
-    const updateActorsData = function () {
-        axios
-            .get<PersonType[]>("/api/movie-actor/" + id)
-            .then((result) => setActorsData(result.data))
-            .catch(() => console.log(errorMessage));
-    };
-
-    const updateDirectorsData = function () {
-        axios
-            .get<PersonType[]>("/api/movie-director/" + id)
-            .then((result) => setDirectorsData(result.data))
-            .catch(() => console.log(errorMessage));
-    };
-
-    useEffect(updateActorsData, [id]);
-    useEffect(updateDirectorsData, [id]);
 
     return (
         <div className="edit_form-inner">
@@ -103,7 +87,7 @@ export default function EditMovieForm({
                     </div>
                 </div>
                 <div className="form-row">
-                    <label htmlFor="rating">Rating</label>
+                    <label htmlFor="rating">Rating / Priority </label>
                     <input
                         type="text"
                         name="rating"
@@ -111,10 +95,11 @@ export default function EditMovieForm({
                         onChange={(e) => handleRatingChange(e)}
                     />
                 </div>
-                {directorsData && (
-                    <PersonList people={directorsData} legend={"Directed by"} />
-                )}
-                {actorsData && <PersonList people={actorsData} legend={"Starring"} />}
+
+                {<EditablePersonList legend={"Directed by"} autocompletionUrl={"/api/director/autocompletion"} deleteUrl={"/api/movie-director"} movieId={movieData.id}
+                                     staff={directorsData} setStaff={setDirectorsData}/>}
+                {<EditablePersonList legend={"Starring"} autocompletionUrl={"/api/actor/autocompletion"} deleteUrl={"/api/movie-actor"} movieId={movieData.id}
+                                     staff={actorsData} setStaff={setActorsData}/>}
             </form>
         </div>
     );

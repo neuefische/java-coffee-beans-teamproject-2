@@ -7,6 +7,7 @@ import {useParams} from "react-router-dom";
 import MovieType from "../../Type/MovieType.tsx";
 import RatingType from "../../Type/RatingType.tsx";
 import axios from "axios";
+import PersonType from "../../Type/PersonType.tsx";
 
 export default function Details(
     {userName}: { userName: string }
@@ -15,6 +16,9 @@ export default function Details(
 
     const [editModeEnabled, setEditModeEnabled] = useState<boolean>(false);
     const {id} = useParams();
+
+    const [actorsData, setActorsData] = useState<PersonType[]>([]);
+    const [directorsData, setDirectorsData] = useState<PersonType[]>([]);
 
     const [movieData, setMovieData] = useState<MovieType>({
         id: "",
@@ -41,23 +45,41 @@ export default function Details(
             () => console.log(errorMessage)
         )
     }
+    const updateActorData = function () {
+        axios.get<PersonType[]>("/api/movie-actor/" + id).then(
+            (result) => setActorsData(result.data)
+        ).catch(
+            () => console.log(errorMessage)
+        )
+    }
+    const updateDirectorData = function () {
+        axios.get<PersonType[]>("/api/movie-director/" + id).then(
+            (result) => setDirectorsData(result.data)
+        ).catch(
+            () => console.log(errorMessage)
+        )
+    }
 
 
     useEffect(updateMovieData, [id]);
     useEffect(updateRatingData, [id]);
+    useEffect(updateActorData, [id]);
+    useEffect(updateDirectorData, [id]);
 
     if (!userName) {
         return;
     }
 
     return (
-        <div>
+        <div className={"details-main"}>
             {editModeEnabled ?
-                <EditMovieForm id={id} setMovieData={setMovieData} setRatingData={setRatingData}
-                               movieData={movieData} ratingData={ratingData}/> :
+                <EditMovieForm setMovieData={setMovieData} setRatingData={setRatingData}
+                               movieData={movieData} ratingData={ratingData} actorsData={actorsData}
+                               setActorsData={setActorsData} directorsData={directorsData}
+                               setDirectorsData={setDirectorsData}/> :
                 <MovieDetails id={id ?? ""}/>}
             <MovieControls editModeEnabled={editModeEnabled} setEditModeEnabled={setEditModeEnabled}
-                           ratingData={ratingData} movieData={movieData}/>
+                           ratingData={ratingData} movieData={movieData} actorData={actorsData} directorData={directorsData}/>
         </div>
     );
 }

@@ -22,14 +22,14 @@ public class MovieActorController {
 
     @PostMapping()
     public MovieActorResponse addRelation(@RequestBody @NonNull MovieActorRequest movieActorRequest) {
-        MovieActorRelation relation = movieActorService.addActor(movieActorRequest.movieId(), movieActorRequest.actorId());
+        MovieActorRelation relation = movieActorService.addActor(movieActorRequest.movieId(), movieActorRequest.personId());
 
         return MovieActorResponse.from(relation);
     }
 
     @DeleteMapping()
     public void deleteRelation(@RequestBody @NonNull MovieActorRequest movieActorRequest) {
-        movieActorService.removeActor(movieActorRequest.movieId(), movieActorRequest.actorId());
+        movieActorService.removeActor(movieActorRequest.movieId(), movieActorRequest.personId());
     }
 
     @DeleteMapping("/{movieId}")

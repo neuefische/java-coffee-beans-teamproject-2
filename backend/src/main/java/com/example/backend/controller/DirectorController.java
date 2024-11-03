@@ -39,4 +39,9 @@ public class DirectorController {
     public void delete(@PathVariable String  id) {
         directorService.deleteDirector(id);
     }
+
+    @GetMapping("/autocompletion/{prefix}")
+    public List<DirectorResponse> getByName(@PathVariable @NonNull String prefix) {
+        return directorService.getDirectorsByPrefix(prefix).stream().map(DirectorResponse::from).toList();
+    }
 }
